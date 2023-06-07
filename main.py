@@ -1,3 +1,4 @@
+from typing import Tuple
 import pyxel
 
 from dataclasses import dataclass
@@ -6,6 +7,13 @@ SPRITEDOWN = 0, 0, 0, 8, 8, 0
 SPRITEUP = 0, 8, 0, 8, 8, 0
 SPRITELEFT = 0, 0, 8, 8, 8, 0
 SPRITERIGHT = 0, 8, 8, 8, 8, 0
+
+ENEMIE_1_DOWN = 0, 24, 0, 8, 8, 0
+ENEMIE_1_UP = 0, 0, 0, 8, 8, 0
+ENEMIE_1_LEFT = 0, 0, 0, 8, 8, 0
+ENEMIE_1_RIGHT = 0, 0, 0, 8, 8, 0
+
+HOUSE = 0, 32, 0, 16, 16, 0
 
 
 def random_walk(character):
@@ -18,7 +26,7 @@ class Enemie:
     name: str
     x: int
     y: int
-    sprite: int
+    sprite: Tuple[int, int, int, int, int, int]
 
 class Player:
     def __init__(self):
@@ -31,7 +39,8 @@ class App:
         self.player = Enemie("Player", 0, 0, SPRITEDOWN)
         self.enemies = []
 
-        self.enemies.append(Enemie("inimigo", 10, 10, SPRITELEFT))
+        self.enemies.append(Enemie("inimigo", 10, 10, ENEMIE_1_DOWN))
+        self.enemies.append(Enemie("objeto", 50, 50, HOUSE))
 
         pyxel.init(160, 120)
         pyxel.load("assets/pyxel.pyxres")
@@ -52,7 +61,8 @@ class App:
             self.player.sprite = SPRITEUP
 
         for enemie in self.enemies:
-            random_walk(enemie)
+            if enemie.name == "inimigo":
+                random_walk(enemie)
 
     def draw(self):
         pyxel.cls(0)
