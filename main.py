@@ -28,7 +28,7 @@ class Player:
 
 class App:
     def __init__(self):
-        self.player = Player()
+        self.player = Enemie("Player", 0, 0, SPRITEDOWN)
         self.enemies = []
 
         self.enemies.append(Enemie("inimigo", 10, 10, SPRITELEFT))
