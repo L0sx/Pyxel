@@ -16,6 +16,9 @@ ENEMIE_1_RIGHT = 0, 0, 0, 8, 8, 0
 HOUSE = 0, 32, 0, 16, 16, 0
 CARAMBA = 0, 0, 16, 8, 8, 0
 
+GRASS = 1, 32, 0, 8, 8, 1
+TREE = 1, 40, 0, 8, 8, 1
+
 
 @dataclass
 class Entity:
@@ -45,8 +48,8 @@ def map_seed(width, height) -> List[Entity]:
                 if not proximos(entities, x, y, 15, "casa"):
                     entities.append(casa(x,y))
             elif n > 0.4:
-                if not proximos(entities, x, y, 15, "inimigo01"):
-                    entities.append(Entity("inimigo01", x, y, CARAMBA))
+                if not proximos(entities, x, y, 15, "tree"):
+                    entities.append(Entity("tree", x, y, TREE))
                 map_list[y][x] = 2
             elif n > 0.2:
                 map_list[y][x] = 3
@@ -60,7 +63,7 @@ def map_seed(width, height) -> List[Entity]:
                 map_list[y][x] = 0
 
 
-            pyxel.pset(x, y, map_list[y][x])
+            # pyxel.pset(x, y, map_list[y][x])
     return entities
 
 

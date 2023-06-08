@@ -3,17 +3,24 @@ import pyxel
 
 from dataclasses import dataclass
 
-SPRITEDOWN = 0, 0, 0, 8, 8, 0
-SPRITEUP = 0, 8, 0, 8, 8, 0
-SPRITELEFT = 0, 0, 8, 8, 8, 0
-SPRITERIGHT = 0, 8, 8, 8, 8, 0
 
-ENEMIE_1_DOWN = 0, 24, 0, 8, 8, 0
-ENEMIE_1_UP = 0, 0, 0, 8, 8, 0
-ENEMIE_1_LEFT = 0, 0, 0, 8, 8, 0
-ENEMIE_1_RIGHT = 0, 0, 0, 8, 8, 0
+COLKEY = 1
 
-HOUSE = 0, 32, 0, 16, 16, 0
+SPRITEDOWN = 0, 0, 0, 8, 8, COLKEY
+SPRITEUP = 0, 8, 0, 8, 8, COLKEY
+SPRITELEFT = 0, 0, 8, 8, 8, COLKEY
+SPRITERIGHT = 0, 8, 8, 8, 8, COLKEY
+
+ENEMIE_1_DOWN = 0, 24, 0, 8, 8, COLKEY
+ENEMIE_1_UP = 0, 0, 0, 8, 8, COLKEY
+ENEMIE_1_LEFT = 0, 0, 0, 8, 8, COLKEY
+ENEMIE_1_RIGHT = 0, 0, 0, 8, 8, COLKEY
+
+HOUSE = 0, 32, 0, 16, 16, COLKEY
+CARAMBA = 0, 0, 16, 8, 8, COLKEY
+
+GRASS = 1, 32, 0, 8, 8, COLKEY
+TREE = 1, 40, 0, 8, 8, COLKEY
 
 
 def random_walk(character):
@@ -22,7 +29,7 @@ def random_walk(character):
 
 
 @dataclass
-class Enemie:
+class Entity:
     name: str
     x: int
     y: int
@@ -36,11 +43,11 @@ class Player:
 
 class App:
     def __init__(self):
-        self.player = Enemie("Player", 0, 0, SPRITEDOWN)
+        self.player = Entity("Player", 0, 0, SPRITEDOWN)
         self.enemies = []
 
-        self.enemies.append(Enemie("inimigo", 10, 10, ENEMIE_1_DOWN))
-        self.enemies.append(Enemie("objeto", 50, 50, HOUSE))
+        self.enemies.append(Entity("inimigo", 10, 10, ENEMIE_1_DOWN))
+        self.enemies.append(Entity("objeto", 50, 50, HOUSE))
 
         pyxel.init(160, 120)
         pyxel.load("assets/pyxel.pyxres")
