@@ -1,7 +1,8 @@
-from typing import Tuple
 import pyxel
 
-from dataclasses import dataclass
+from map_gen import map_seed
+from entity import Entity
+
 
 
 COLKEY = 1
@@ -28,29 +29,19 @@ def random_walk(character):
     character.y = (character.y - pyxel.rndi(-1, 1)) % pyxel.width
 
 
-@dataclass
-class Entity:
-    name: str
-    x: int
-    y: int
-    sprite: Tuple[int, int, int, int, int, int]
 
-class Player:
-    def __init__(self):
-        self.x = 0
-        self.y = 0
-        self.sprite = SPRITEDOWN
 
 class App:
     def __init__(self):
         self.player = Entity("Player", 0, 0, SPRITEDOWN)
-        self.enemies = []
+        self.entities = []
 
-        self.enemies.append(Entity("inimigo", 10, 10, ENEMIE_1_DOWN))
-        self.enemies.append(Entity("objeto", 50, 50, HOUSE))
+        self.entities.append(Entity("inimigo", 10, 10, ENEMIE_1_DOWN))
 
         pyxel.init(160, 120)
         pyxel.load("assets/pyxel.pyxres")
+        more_entities = map_seed()
+        self.entities += more_entities
         pyxel.run(self.update, self.draw)
 
     def update(self):
@@ -67,16 +58,18 @@ class App:
             self.player.y = (self.player.y - 1) % pyxel.height
             self.player.sprite = SPRITEUP
 
-        for enemie in self.enemies:
-            if enemie.name == "inimigo":
-                random_walk(enemie)
+        for entity in self.entities:
+            if entity.name == "inimigo":
+                random_walk(entity)
 
     def draw(self):
-        pyxel.cls(0)
+        pyxel.cls(1)
         pyxel.blt(self.player.x, self.player.y, *self.player.sprite)
         
-        for enemie in self.enemies:
-            pyxel.blt(enemie.x, enemie.y, *enemie.sprite)
+        for entity in self.entities:
+            pyxel.blt(entity.x, entity.y, *entity.sprite)
+
+        pyxel.text(10, 10, "map_gen", 3)
         
 
 App()

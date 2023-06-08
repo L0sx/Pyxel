@@ -17,7 +17,7 @@ class App:
                 n = pyxel.noise(
                     x / 10,
                     y / 10,
-                    pyxel.frame_count / 40,
+                    pyxel.frame_count / 100,
                 )
                 if n > 0.4:
                     col = 7
