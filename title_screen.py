@@ -1,79 +1,89 @@
-import pyxel 
+import pyxel
 
-from typing import Tuple
-from pyxel import *
-
-from dataclasses import dataclass
-
-SPRITEDOWN = 0, 0, 0, 8, 8, 0
-SPRITEUP = 0, 8, 0, 8, 8, 0
-SPRITELEFT = 0, 0, 8, 8, 8, 0
-SPRITERIGHT = 0, 8, 8, 8, 8, 0
-
-ENEMIE_1_DOWN = 0, 24, 0, 8, 8, 0
-ENEMIE_1_UP = 0, 0, 0, 8, 8, 0
-ENEMIE_1_LEFT = 0, 0, 0, 8, 8, 0
-ENEMIE_1_RIGHT = 0, 0, 0, 8, 8, 0
-
-HOUSE = 0, 32, 0, 16, 16, 0
+from map_gen import map_seed
+from entity import Entity
 
 
-def random_walk(character):
-    character.x = (character.x - rndi(-1, 1)) % pyxel.width
-    character.y = (character.y - rndi(-1, 1)) % pyxel.height
+COLKEY = 1
 
+SPRITEDOWN = 0, 0, 0, 8, 8, COLKEY
+SPRITEUP = 0, 8, 0, 8, 8, COLKEY
+SPRITELEFT = 0, 0, 8, 8, 8, COLKEY
+SPRITERIGHT = 0, 8, 8, 8, 8, COLKEY
 
-@dataclass
-class Enemie:
-    name: str
-    x: int
-    y: int
-    sprite: Tuple[int, int, int, int, int, int]
+ENEMIE_1_DOWN = 0, 24, 0, 8, 8, COLKEY
+ENEMIE_1_UP = 0, 0, 0, 8, 8, COLKEY
+ENEMIE_1_LEFT = 0, 0, 0, 8, 8, COLKEY
+ENEMIE_1_RIGHT = 0, 0, 0, 8, 8, COLKEY
 
-class Player:
-    def __init__(self):
-        self.x = 0
-        self.y = 0
-        self.sprite = SPRITEDOWN
+HOUSE = 0, 32, 0, 16, 16, COLKEY
+CARAMBA = 0, 0, 16, 8, 8, COLKEY
+
+GRASS = 1, 32, 0, 8, 8, COLKEY
+TREE = 1, 40, 0, 8, 8, COLKEY
+
+def center_x_text(y, text, colkey=9, bg=None):
+    x = pyxel.width / 2 - len(text) * 2
+
+    if bg:
+        pyxel.rect(x-1, y-1, len(text) * 4 + 2, 5 + 2, bg)
+
+    pyxel.text(x, y, text, colkey)
+
 
 class App:
     def __init__(self):
-        self.player = Enemie("Player", 0, 0, SPRITEDOWN)
-        self.enemies = []
-
-        self.enemies.append(Enemie("inimigo", 10, 10, ENEMIE_1_DOWN))
-        self.enemies.append(Enemie("objeto", 50, 50, HOUSE))
-
-        init(160, 120)
-        load("assets/pyxel.pyxres")
-        run(self.update, self.draw)
+        self.menu_options = [
+                "start",
+                "configs",
+                "credits"
+                ]
+        self.current_option = 0
+        pyxel.init(160, 120)
+        pyxel.load("assets/pyxel.pyxres")
+        pyxel.run(self.update, self.draw)
 
     def update(self):
-        if btn(KEY_LEFT):
-            self.player.x = (self.player.x - 1) % width
-            self.player.sprite = SPRITELEFT
-        if btn(KEY_RIGHT):
-            self.player.x = (self.player.x + 1) % width
-            self.player.sprite = SPRITERIGHT
-        if btn(KEY_DOWN):
-            self.player.y = (self.player.y + 1) % height
-            self.player.sprite = SPRITEDOWN
-        if btn(KEY_UP):
-            self.player.y = (self.player.y - 1) % height
-            self.player.sprite = SPRITEUP
+        if pyxel.btnp(pyxel.KEY_LEFT):
+            pass
+        if pyxel.btnp(pyxel.KEY_RIGHT):
+            pass
+        if pyxel.btnp(pyxel.KEY_DOWN):
+            self.current_option = (self.current_option + 1) % len(self.menu_options)
+        if pyxel.btnp(pyxel.KEY_UP):
+            self.current_option = (self.current_option - 1) % len(self.menu_options)
+        if pyxel.btnp(pyxel.KEY_A):
+            pass
 
-        for enemie in self.enemies:
-            if enemie.name == "inimigo":
-                random_walk(enemie)
 
     def draw(self):
-        cls(0)
-        blt(self.player.x, self.player.y, *self.player.sprite)
-        
-        for enemie in self.enemies:
-            blt(enemie.x, enemie.y, *enemie.sprite)
+        pyxel.cls(1)
+        for y in range(pyxel.height):
+            for x in range(pyxel.width):
+                n = pyxel.noise(x/20, y/20, pyxel.frame_count/ 40)
+                if n > 0.7:
+                    point_val = 1
+                elif n > 0.4:
+                    point_val = 2
+                elif n > 0.2:
+                    point_val = 3
+                elif n > 0:
+                    point_val = 4
+                elif n > -0.3:
+                    point_val = 5
+                elif n > -0.7:
+                    point_val = 6
+                else:
+                    point_val = 0
 
-        text(10, 10, "titulo", 3)
-        
+                pyxel.pset(x, y, point_val)
+        first30 = pyxel.height * 0.3
+        center_x_text(first30 / 2, "TITULO DO JOGO", 9, 13)
 
-App()
+        for i, option in enumerate(self.menu_options):
+            color = pyxel.frame_count % 15 if i == self.current_option else 9
+            center_x_text(first30 + i*8, option, color, 12)
+
+
+if __name__ == "__main__":
+    App()
