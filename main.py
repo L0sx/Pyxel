@@ -8,6 +8,11 @@ from entity import Entity
 
 COLKEY = 1
 
+SPRITEATTACK1 = 0, 0, 0, 8, 8, COLKEY
+SPRITEATTACK2 = 2, 8, 0, 8, 8, 0
+SPRITEATTACK3 = 2, 0, 8, 8, 8, 0
+SPRITEATTACK4 = 2, 8, 8, 8, 8, 0
+
 SPRITEDOWN = 0, 0, 0, 8, 8, COLKEY
 SPRITEUP = 0, 8, 0, 8, 8, COLKEY
 SPRITELEFT = 0, 0, 8, 8, 8, COLKEY
@@ -28,6 +33,14 @@ TREE = 1, 40, 0, 8, 8, COLKEY
 def random_walk(character):
     character.x = (character.x - pyxel.rndi(-1, 1)) % pyxel.width
     character.y = (character.y - pyxel.rndi(-1, 1)) % pyxel.width
+
+def attack_walk(character):
+        for i in range(character.repeat):
+            if character.direct == "left":
+                character.x = character.x - 1
+            if i == 3:
+                return True
+        
 
 def verifyCollision(objeto1, objeto2):
         if (objeto1.x < objeto2.x + objeto2.sprite[3] and
@@ -58,25 +71,39 @@ class App:
         if pyxel.btn(pyxel.KEY_LEFT):
             self.player.x = (self.player.x - 1) % pyxel.width
             self.player.sprite = SPRITELEFT
-            self.last_key_pressed = pyxel.KEY_LEFT
+            self.last_key_pressed = "left"
         if pyxel.btn(pyxel.KEY_RIGHT):
             self.player.x = (self.player.x + 1) % pyxel.width
             self.player.sprite = SPRITERIGHT
-            self.last_key_pressed = pyxel.KEY_RIGHT
+            self.last_key_pressed = "right"
         if pyxel.btn(pyxel.KEY_DOWN):
             self.player.y = (self.player.y + 1) % pyxel.height
             self.player.sprite = SPRITEDOWN
-            self.last_key_pressed = pyxel.KEY_DOWN
+            self.last_key_pressed = "down"
         if pyxel.btn(pyxel.KEY_UP):
             self.player.y = (self.player.y - 1) % pyxel.height
             self.player.sprite = SPRITEUP
-            self.last_key_pressed = pyxel.KEY_UP
-        if pyxel.btn(pyxel.KEY_A):
-            self.draw_player_attack()
+            self.last_key_pressed = "up"
+        if pyxel.btnp(pyxel.KEY_A):
+            self.attack()
 
         for entity in self.entities:
             if entity.name == "inimigo":
                 random_walk(entity)
+            if entity.name == "attack" and entity.is_alive == True:
+                    for i in range(entity.repeat):
+                        if entity.direct == "left":
+                            entity.x -= 1
+                        elif entity.direct == "right":
+                            entity.x += 1
+                        elif entity.direct == "up":
+                            entity.y -= 1
+                        elif entity.direct == "down":
+                            entity.y += 1
+                    Entity.die(entity)
+                    print(entity)
+
+        
         for entity in self.entities:
             if entity.name == "inimigo" and verifyCollision(self.player, entity):
                 if self.player.x < entity.x:
@@ -99,47 +126,8 @@ class App:
         vida_texto = "Vida: {}".format(self.vida)
         pyxel.text(10, 10, vida_texto, 7)
 
-    def draw_player_attack(self):
+    def attack(self):
         pyxel.cls(2)
-        angle = 0
-
-        if self.last_key_pressed == pyxel.KEY_UP:
-            angle = 270
-        elif self.last_key_pressed == pyxel.KEY_DOWN:
-            angle = 90
-        elif self.last_key_pressed == pyxel.KEY_LEFT:
-            angle = 180
-        elif self.last_key_pressed == pyxel.KEY_RIGHT:
-            angle = 0
-
-        # Converter o ângulo para radianos
-        angle_rad = math.radians(angle)
-
-        # Calcular as coordenadas finais do raio de ataque
-        attack_length = 40
-        attack_end_x = self.player.x + attack_length * math.cos(angle_rad)
-        attack_end_y = self.player.y + attack_length * math.sin(angle_rad)
-
-        rect_width = abs(attack_end_x - self.player.x)
-        rect_height = abs(attack_end_y - self.player.y)
-        rect_x = min(attack_end_x, self.player.x)
-        rect_y = min(attack_end_y, self.player.y)
-        
-
-        # Desenhar o raio de ataque
-        pyxel.rect(rect_x, rect_y, rect_width, rect_height, 9)
-
-        # Verificar colisão com inimigos
-        for entity in self.entities:
-            if self.check_collision(entity, attack_end_x, attack_end_y):
-                print("Inimigo atingido!")
-
-    def check_collision(self, entity, x, y):
-        enemy_size = 16
-        if (x > entity.x and x < entity.x + enemy_size and
-            y > entity.y and y < entity.y + enemy_size):
-            return True
-        return False
-        
+        self.entities.append(Entity("attack", self.player.x, self.player.y, SPRITEATTACK1, repeat= 10, direct=self.last_key_pressed))
 
 App()
