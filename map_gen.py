@@ -1,35 +1,18 @@
 import pyxel 
 
-from typing import Tuple, List
-from dataclasses import dataclass, field
+from typing import List
 
-from entity import Entity
+from entity import Object
+from sprites import TREE, GRASS
 
-COLKEY = 1
 
-SPRITEDOWN = 0, 0, 0, 8, 8, COLKEY
-SPRITEUP = 0, 8, 0, 8, 8, COLKEY
-SPRITELEFT = 0, 0, 8, 8, 8, COLKEY
-SPRITERIGHT = 0, 8, 8, 8, 8, COLKEY
-
-ENEMIE_1_DOWN = 0, 24, 0, 8, 8, COLKEY
-ENEMIE_1_UP = 0, 0, 0, 8, 8, COLKEY
-ENEMIE_1_LEFT = 0, 0, 0, 8, 8, COLKEY
-ENEMIE_1_RIGHT = 0, 0, 0, 8, 8, COLKEY
-
-HOUSE = 1, 0, 0, 16, 16, 0
-CARAMBA = 0, 0, 16, 8, 8, COLKEY
-
-GRASS = 1, 32, 0, 8, 8, COLKEY
-TREE = 1, 40, 0, 8, 8, COLKEY
-
-def proximos(entities, x, y, distance=10, type=None) -> int:
-    if type:
-        entities = [entity for entity in entities if entity.name == type]
+def proximos(entities, x, y, distance=10, name=None) -> int:
+    if name:
+        entities = [entity for entity in entities if name == entity.name]
     proximos = [entity for entity in entities if abs(entity.x - x) < distance and abs(entity.y - y) < distance]
     return len(proximos)
 
-def map_seed() -> List[Entity]:
+def map_seed() -> List[Object]:
     entities = []
     for y in range(pyxel.height):
         for x in range(pyxel.width):
@@ -37,10 +20,12 @@ def map_seed() -> List[Entity]:
             if n > 0.7:
                 point_val = 1
                 if not proximos(entities, x, y, 15, "tree"):
-                    entities.append(Entity("tree", x, y, TREE))
+                    tree = Object(x, y, TREE, "tree")
+                    entities.append(tree)
             elif n > 0.4:
                 if not proximos(entities, x, y, 15, "grass"):
-                    entities.append(Entity("grass", x, y, GRASS))
+                    grass = Object(x, y, GRASS, "grass")
+                    entities.append(grass)
                     pass
                 point_val = 2
             elif n > 0.2:

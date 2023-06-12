@@ -1,7 +1,5 @@
 import pyxel
 
-from map_gen import map_seed
-from entity import Entity
 
 
 COLKEY = 1
