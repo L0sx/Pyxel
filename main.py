@@ -7,15 +7,30 @@ from sprites import ATTACK, ENEMIE1, PLAYER, LEFT, RIGHT, UP, DOWN
 
 
 
+class PlayerHUD:
+    def __init__(self) -> None:
+        self.height = 10
+
+    def drawn(self, player):
+        start_h = pyxel.height - self.height
+        half_height = self.height/2
+
+        pyxel.tri(0, start_h-10, 0, pyxel.height, self.height+10, pyxel.height, 13)
+        pyxel.circ(0+half_height, start_h + half_height, half_height, 8)
+        pyxel.rect(0, start_h, self.height+1, (10-player.vida) % 10, 13)
+
+        pyxel.text(self.height, start_h, f"{player.vida}", 7)
+
+        pyxel.circ(pyxel.width-half_height, start_h + half_height + 3, half_height, 6)
 
 class App:
     def __init__(self):
-        self.player = Player(80, 60, PLAYER[DOWN])
         self.entities = []
         self._trash = set()
+        self.player_hud = PlayerHUD()
 
+        self.player = Player(80, 60, PLAYER[DOWN])
         self.direction = DOWN
-
         test_enemy = Enemy(10, 10, ENEMIE1[DOWN])
         self.entities.append(test_enemy)
 
@@ -87,6 +102,8 @@ class App:
 
         vida_texto = "Vida: {}".format(self.player.vida)
         pyxel.text(10, 10, vida_texto, 7)
+
+        self.player_hud.drawn(self.player)
 
     def attack(self):
         speedx, speedy = self.direction.value

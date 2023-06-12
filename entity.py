@@ -55,9 +55,14 @@ class Enemy:
     speedx: int = 0
     speedy: int = 0
 
-    def walk(self):
-        self.speedx = pyxel.rndi(-1, 1) 
+    def rand_vel(self):
+        self.speedx = pyxel.rndi(-1, 1)
         self.speedy = pyxel.rndi(-1, 1)
+
+    def walk(self):
+        self.rand_vel()
+        self.x %= pyxel.width
+        self.y %= pyxel.height
 
 
 @dataclass
