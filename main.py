@@ -73,6 +73,7 @@ class App:
             projectile.y += projectile.speedy
             if projectile.duration <= 0:
                 self.kill(entity_id)
+    
 
         for entity_id, enemy in self.filter_entities(Enemy):
             enemy.x += enemy.speedx
@@ -87,7 +88,10 @@ class App:
                     self.player.vida -= 1
                     self.player.x += 5
                     enemy.x -= 5
-
+            for project_id, projectile in self.filter_entities(Projectile):
+                if verifyCollision(enemy, projectile):
+                    self.kill(entity_id)       
+    
         trash = reversed(sorted(self._trash))
         for entity_id in trash:
             del self.entities[entity_id]
