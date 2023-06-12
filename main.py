@@ -8,7 +8,7 @@ from entity import Entity
 
 COLKEY = 1
 
-SPRITEATTACK1 = 0, 0, 0, 8, 8, COLKEY
+SPRITEATTACK1 = 2, 0, 0, 8, 8, 0
 SPRITEATTACK2 = 2, 8, 0, 8, 8, 0
 SPRITEATTACK3 = 2, 0, 8, 8, 8, 0
 SPRITEATTACK4 = 2, 8, 8, 8, 8, 0
@@ -90,8 +90,9 @@ class App:
         for entity in self.entities:
             if entity.name == "inimigo":
                 random_walk(entity)
-            if entity.name == "attack" and entity.is_alive == True:
-                    for i in range(entity.repeat):
+            if entity.name == "attack" and entity.is_alive:
+                    if entity.repeat > 0:
+                        entity.repeat -= 1
                         if entity.direct == "left":
                             entity.x -= 1
                         elif entity.direct == "right":
@@ -100,8 +101,8 @@ class App:
                             entity.y -= 1
                         elif entity.direct == "down":
                             entity.y += 1
-                    Entity.die(entity)
-                    print(entity)
+                    else: Entity.die(entity)
+                    
 
         
         for entity in self.entities:
@@ -127,7 +128,6 @@ class App:
         pyxel.text(10, 10, vida_texto, 7)
 
     def attack(self):
-        pyxel.cls(2)
         self.entities.append(Entity("attack", self.player.x, self.player.y, SPRITEATTACK1, repeat= 10, direct=self.last_key_pressed))
 
 App()
