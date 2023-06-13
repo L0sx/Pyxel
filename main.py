@@ -2,7 +2,7 @@ from typing import Callable, Generator, Tuple
 import pyxel
 
 from map_gen import map_seed
-from entity import Enemy, Player, Projectile, verifyCollision
+from entity import Enemy, Player, Projectile, verifyCollision, changeSprite
 from sprites import ATTACK, ENEMIE1, PLAYER, LEFT, RIGHT, UP, DOWN
 
 
@@ -104,6 +104,9 @@ class App:
         for entity in self.entities:
             pyxel.blt(entity.x, entity.y, *entity.sprite)
 
+        for entity_id, attack in self.filter_entities(Projectile):
+            changeSprite(attack)
+
         vida_texto = "Vida: {}".format(self.player.vida)
         pyxel.text(10, 10, vida_texto, 7)
 
@@ -112,7 +115,7 @@ class App:
     def attack(self):
         speedx, speedy = self.direction.value
 
-        attack = Projectile(self.player.x, self.player.y, ATTACK[0], speedx, speedy) 
+        attack = Projectile(self.player.x, self.player.y, ATTACK[0], speedx, speedy)
         self.entities.append(attack)
 
 App()
