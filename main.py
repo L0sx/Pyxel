@@ -6,7 +6,6 @@ from entity import Enemy, Player, Projectile, verifyCollision, changeSprite, Ite
 from sprites import ATTACK, ENEMIE1, PLAYER, LEFT, RIGHT, UP, DOWN, ITEM
 
 
-
 class PlayerHUD:
     def __init__(self) -> None:
         self.height = 10
@@ -15,13 +14,16 @@ class PlayerHUD:
         start_h = pyxel.height - self.height
         half_height = self.height/2
 
-        pyxel.tri(0, start_h-10, 0, pyxel.height, self.height+10, pyxel.height, 13)
+        pyxel.tri(0, start_h-10, 0, pyxel.height,
+                  self.height+10, pyxel.height, 13)
         pyxel.circ(0+half_height, start_h + half_height, half_height, 8)
         pyxel.rect(0, start_h, self.height+1, (10-player.vida) % 10, 13)
 
         pyxel.text(self.height, start_h, f"{player.vida}", 7)
 
-        pyxel.circ(pyxel.width-half_height, start_h + half_height + 3, half_height, 6)
+        pyxel.circ(pyxel.width-half_height, start_h +
+                   half_height + 3, half_height, 6)
+
 
 class App:
     def __init__(self):
@@ -34,6 +36,8 @@ class App:
         test_enemy = Enemy(10, 10, ENEMIE1[DOWN])
         self.entities.append(test_enemy)
 
+        self.last_spawn = 0
+
         pyxel.init(160, 120)
         pyxel.load("assets/pyxel.pyxres")
         map_entities = map_seed()
@@ -41,8 +45,17 @@ class App:
 
         pyxel.run(self.update, self.draw)
 
+    def spawn_enemy(self):
+        enemy_count = len([enemy for enemy in self.filter_entities(Enemy)])
+        if self.last_spawn + 100 < pyxel.frame_count and enemy_count < 10:
+            self.last_spawn = pyxel.frame_count
+            x = pyxel.rndi(0, pyxel.width)
+            y = pyxel.rndi(0, pyxel.height)
+            new_enemy = Enemy(x, y, ENEMIE1[DOWN])
+            self.entities.append(new_enemy)
+
     def filter_entities(self, _type) -> Generator[Tuple[int, Callable], None, None]:
-        return ((i ,entity) for i, entity in enumerate(self.entities) if isinstance(entity, _type))
+        return ((i, entity) for i, entity in enumerate(self.entities) if isinstance(entity, _type))
 
     def kill(self, entity_id) -> None:
         self._trash.add(entity_id)
@@ -67,6 +80,8 @@ class App:
         if pyxel.btnp(pyxel.KEY_A):
             self.attack()
 
+        self.spawn_enemy()
+
         for entity_id, projectile in self.filter_entities(Projectile):
             projectile.duration -= 1
             projectile.x += projectile.speedx
@@ -89,10 +104,10 @@ class App:
                     enemy.x -= 5
             for project_id, projectile in self.filter_entities(Projectile):
                 if verifyCollision(enemy, projectile):
-                    self.kill(entity_id)   
+                    self.kill(entity_id)
                     item = Item(enemy.x, enemy.y, ITEM['blade'])
-                    self.entities.append(item)   
-    
+                    self.entities.append(item)
+
         trash = reversed(sorted(self._trash))
         for entity_id in trash:
             del self.entities[entity_id]
@@ -101,7 +116,7 @@ class App:
     def draw(self):
         pyxel.cls(1)
         pyxel.blt(self.player.x, self.player.y, *self.player.sprite)
-        
+
         for entity in self.entities:
             pyxel.blt(entity.x, entity.y, *entity.sprite)
 
@@ -122,8 +137,9 @@ class App:
 
         new_x = self.player.x + new_speedx
         new_y = self.player.y + new_speedy
-        
+
         attack = Projectile(new_x, new_y, ATTACK[0], speedx, speedy)
         self.entities.append(attack)
+
 
 App()
