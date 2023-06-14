@@ -1,4 +1,4 @@
-import pyxel 
+import pyxel
 
 from typing import List
 
@@ -9,14 +9,16 @@ from sprites import TREE, GRASS
 def proximos(entities, x, y, distance=10, name=None) -> int:
     if name:
         entities = [entity for entity in entities if name == entity.name]
-    proximos = [entity for entity in entities if abs(entity.x - x) < distance and abs(entity.y - y) < distance]
+    proximos = [entity for entity in entities if abs(
+        entity.x - x) < distance and abs(entity.y - y) < distance]
     return len(proximos)
+
 
 def map_seed() -> List[Object]:
     entities = []
     for y in range(pyxel.height):
         for x in range(pyxel.width):
-            n = pyxel.noise(x/20, y/20, 0)
+            n = pyxel.noise(x/20, y/20, pyxel.frame_count)
             if n > 0.7:
                 point_val = 1
                 if not proximos(entities, x, y, 15, "tree"):

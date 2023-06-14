@@ -126,3 +126,11 @@ class Item:
     x: int
     y: int
     sprite: SPRITE_TYPE
+
+
+@dataclass
+class Portal:
+    x: int
+    y: int
+    sprite: SPRITE_TYPE
+    sprite_list: Tuple[SPRITE_TYPE] | None = None

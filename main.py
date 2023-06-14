@@ -5,9 +5,9 @@ from typing import Callable, Generator, Tuple
 import pyxel
 
 from map_gen import map_seed
-from entity import (Enemy, Player, Projectile, verifyCollision,
+from entity import (Enemy, Player, Portal, Projectile, verifyCollision,
                     Item, player_controller)
-from sprites import ATTACK, ENEMIE1, PLAYER, DOWN, Items
+from sprites import ATTACK, ENEMIE1, PLAYER, DOWN, PORTAL, Items
 from hud import PlayerHUD
 
 
@@ -34,23 +34,33 @@ class App:
         self.entities = []
         self._trash = set()
         self.player_hud = PlayerHUD()
+        self.bg_color = pyxel.rndi(0, 15)
 
         self.player = Player(80, 60, PLAYER[DOWN])
         self.direction = DOWN
+        self.points = 0
         self.last_spawn = 0
+        self.portal = False
 
         map_entities = map_seed()
         self.entities += map_entities
 
-    def spawn_enemy(self):
-        log.debug("spawning enemie")
+    def spawn(self):
         enemy_count = len([enemy for enemy in self.filter_entities(Enemy)])
         if self.last_spawn + 10 < pyxel.frame_count and enemy_count < 10:
+            log.debug("spawning enemie")
             self.last_spawn = pyxel.frame_count
             x = pyxel.rndi(0, pyxel.width)
             y = pyxel.rndi(0, pyxel.height)
             new_enemy = Enemy(x, y, ENEMIE1[DOWN])
             self.entities.append(new_enemy)
+
+        if self.points >= 10 and not self.portal:
+            log.info(f"points {self.points}")
+            portal = Portal(pyxel.width // 2, pyxel.height // 2,
+                            PORTAL[0], PORTAL)
+            self.entities.append(portal)
+            self.portal = True
 
     def filter_entities(self, _type) -> Generator[Tuple[int, Callable], None, None]:
         return ((i, entity) for i, entity in enumerate(self.entities) if isinstance(entity, _type))
@@ -85,6 +95,7 @@ class App:
                 if verifyCollision(enemy, projectile):
                     pyxel.play(0, 0)
                     self.kill(entity_id)
+                    self.points += 1
                     item = Item(enemy.x, enemy.y, Items.blade)
                     self.entities.append(item)
 
@@ -92,12 +103,16 @@ class App:
             if verifyCollision(item, self.player):
                 self.kill(entity_id)
                 self.player.inventory.append(item)
-                log.info(f"player pegou o item: {entity_id}")
+                log.debug(f"player pegou o item: {entity_id}")
+
+        for entity_id, portal in self.filter_entities(Portal):
+            if verifyCollision(portal, self.player):
+                self.reset()
 
     def update(self):
         player_controller(self)
         self.entities_collision()
-        self.spawn_enemy()
+        self.spawn()
 
         trash = reversed(sorted(self._trash))
         for entity_id in trash:
@@ -106,7 +121,7 @@ class App:
             log.debug(f"entidade: {entity_id} foi deletado")
 
     def draw(self):
-        pyxel.cls(1)
+        pyxel.cls(self.bg_color)
         pyxel.blt(self.player.x, self.player.y, *self.player.sprite)
 
         for entity in self.entities:
@@ -118,7 +133,7 @@ class App:
                 entity.sprite = entity.sprite_list[sprite_i]
             pyxel.blt(entity.x, entity.y, *entity.sprite)
 
-        vida_texto = "Vida: {}".format(self.player.vida)
+        vida_texto = "points: {}".format(self.points)
         pyxel.text(10, 10, vida_texto, 7)
 
         self.player_hud.drawn(self.player)

@@ -42,7 +42,7 @@ ENEMIE1 = {
     LEFT: (0, 0, 0, 8, 8, COLKEY),
     RIGHT: (0, 0, 0, 8, 8, COLKEY),
     UP: (0, 0, 0, 8, 8, COLKEY),
-    DOWN: (0, 24, 0, 8, 8, COLKEY),
+    DOWN: (0, 24, 0, 8, 8, 1),
 }
 
 
@@ -55,3 +55,8 @@ CARAMBA = 0, 0, 16, 8, 8, COLKEY
 
 GRASS = 1, 32, 0, 8, 8, COLKEY
 TREE = 1, 40, 0, 8, 8, COLKEY
+
+PORTAL = (
+    (1, 32, 8, 8, 8, COLKEY),
+    (1, 40, 8, 8, 8, COLKEY),
+)
