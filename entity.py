@@ -1,8 +1,9 @@
 import pyxel
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from sprites import SPRITE_TYPE, Sides, PLAYER, LEFT, RIGHT, UP, DOWN
+
 
 def playerController(self):
     if pyxel.btn(pyxel.KEY_LEFT):
@@ -26,13 +27,14 @@ def playerController(self):
 
 
 def verifyCollision(objeto1, objeto2):
-        if (objeto1.x < objeto2.x + objeto2.sprite[3] and
-                objeto1.x + objeto1.sprite[3] > objeto2.x and
-                objeto1.y < objeto2.y + objeto2.sprite[4] and
-                objeto1.y + objeto1.sprite[4] > objeto2.y):
-            return True
-        else:
-            return False
+    if (objeto1.x < objeto2.x + objeto2.sprite[3] and
+            objeto1.x + objeto1.sprite[3] > objeto2.x and
+            objeto1.y < objeto2.y + objeto2.sprite[4] and
+            objeto1.y + objeto1.sprite[4] > objeto2.y):
+        return True
+    else:
+        return False
+
 
 def changeSprite(character):
     sprite_nums = character.sprite[1:3]
@@ -55,18 +57,20 @@ def changeSprite(character):
         sprite_list[2] = 0
         character.sprite = tuple(sprite_list)
 
+
 def random_walk(character):
     character.x = (character.x - pyxel.rndi(-1, 1)) % pyxel.width
     character.y = (character.y - pyxel.rndi(-1, 1)) % pyxel.width
 
+
 def addItem(character, item):
     character.inventory.append(item)
     print("itens:", character.inventory)
-     
 
 
 def is_in_inventory(character, item):
-     return item in character.inventory
+    return item in character.inventory
+
 
 @dataclass
 class Object:
@@ -89,8 +93,7 @@ class Player:
     direct: Sides = Sides.DOWN
     is_alive: bool = True
     vida: int = 10
-    inventory: list = None
-    
+    inventory: list = field(default_factory=list)
 
 
 @dataclass
@@ -121,10 +124,9 @@ class Projectile:
     duration: int = 30
     angle: int = 0
 
+
 @dataclass
 class Item:
     x: int
     y: int
     sprite: SPRITE_TYPE
-    
-

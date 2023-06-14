@@ -24,6 +24,12 @@ class PlayerHUD:
         pyxel.circ(pyxel.width-half_height, start_h +
                    half_height + 3, half_height, 6)
 
+        for i, item in enumerate(player.inventory):
+            x = 20 + i * 11
+            y = start_h
+            pyxel.rect(x-1, y-1, 10, 10, 13)
+            pyxel.blt(x, y, *item.sprite)
+
 
 class App:
     def __init__(self):
@@ -48,7 +54,7 @@ class App:
 
     def spawn_enemy(self):
         enemy_count = len([enemy for enemy in self.filter_entities(Enemy)])
-        if self.last_spawn + 100 < pyxel.frame_count and enemy_count < 10:
+        if self.last_spawn + 10 < pyxel.frame_count and enemy_count < 10:
             self.last_spawn = pyxel.frame_count
             x = pyxel.rndi(0, pyxel.width)
             y = pyxel.rndi(0, pyxel.height)
@@ -62,7 +68,7 @@ class App:
         self._trash.add(entity_id)
 
     def update(self):
-        
+
         playerController(self)
 
         self.spawn_enemy()
@@ -97,7 +103,7 @@ class App:
         for entity_id in trash:
             del self.entities[entity_id]
             self._trash.remove(entity_id)
-            
+
             for item_id, item in self.filter_entities(Item):
                 if verifyCollision(item, self.player):
                     self.kill(item_id)
