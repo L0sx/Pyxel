@@ -72,6 +72,7 @@ class App:
             enemy.y += enemy.speedy
             enemy.walk()
             if verifyCollision(self.player, enemy):
+                pyxel.play(0, 1)
                 if self.player.x < enemy.x:
                     self.player.vida -= 1
                     self.player.x -= 5
@@ -82,6 +83,7 @@ class App:
                     enemy.x -= 5
             for project_id, projectile in self.filter_entities(Projectile):
                 if verifyCollision(enemy, projectile):
+                    pyxel.play(0, 0)
                     self.kill(entity_id)
                     item = Item(enemy.x, enemy.y, Items.blade)
                     self.entities.append(item)
