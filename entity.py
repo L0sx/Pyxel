@@ -4,7 +4,7 @@ import pyxel
 
 from dataclasses import dataclass, field
 
-from sprites import SPRITE_TYPE, Sides, PLAYER, LEFT, RIGHT, UP, DOWN, Items
+from sprites import SPRITE_TYPE, Sides, PLAYER, LEFT, RIGHT, UP, DOWN, ATTACK
 
 
 log = logging.getLogger(__name__)
@@ -29,6 +29,25 @@ def player_controller(self):
         self.direction = UP
     if pyxel.btnp(pyxel.KEY_A):
         self.attack()
+    if pyxel.btnp(pyxel.KEY_SPACE):
+        self.entities += boom(self.player.x, self.player.y)
+
+
+def boom(x, y):
+    return_list = []
+    for side in Sides:
+        speedx, speedy = side.value
+
+        multi = 8
+        new_speedx = speedx * multi
+        new_speedy = speedy * multi
+
+        new_x = x + new_speedx
+        new_y = y + new_speedy
+
+        attack = Projectile(new_x, new_y, ATTACK[0], ATTACK, speedx, speedy)
+        return_list.append(attack)
+    return return_list
 
 
 def verifyCollision(objeto1, objeto2):

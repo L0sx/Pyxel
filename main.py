@@ -6,7 +6,7 @@ import pyxel
 
 from map_gen import map_seed
 from entity import (Enemy, Player, Projectile, verifyCollision,
-                    Item, player_controller, addItem)
+                    Item, player_controller)
 from sprites import ATTACK, ENEMIE1, PLAYER, DOWN, Items
 from hud import PlayerHUD
 
