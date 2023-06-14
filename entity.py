@@ -1,11 +1,12 @@
+from typing import Tuple
 import pyxel
 
 from dataclasses import dataclass, field
 
-from sprites import SPRITE_TYPE, Sides, PLAYER, LEFT, RIGHT, UP, DOWN
+from sprites import SPRITE_TYPE, Sides, PLAYER, LEFT, RIGHT, UP, DOWN, Items
 
 
-def playerController(self):
+def player_controller(self):
     if pyxel.btn(pyxel.KEY_LEFT):
         self.player.x = (self.player.x - 1) % pyxel.width
         self.player.sprite = PLAYER[LEFT]
@@ -34,28 +35,6 @@ def verifyCollision(objeto1, objeto2):
         return True
     else:
         return False
-
-
-def changeSprite(character):
-    sprite_nums = character.sprite[1:3]
-    sprite_list = list(character.sprite)
-
-    if sprite_nums == (0, 0):
-        sprite_list[1] = 8
-        sprite_list[2] = 0
-        character.sprite = tuple(sprite_list)
-    elif sprite_nums == (8, 0):
-        sprite_list[1] = 0
-        sprite_list[2] = 8
-        character.sprite = tuple(sprite_list)
-    elif sprite_nums == (0, 8):
-        sprite_list[1] = 8
-        sprite_list[2] = 8
-        character.sprite = tuple(sprite_list)
-    elif sprite_nums == (8, 8):
-        sprite_list[1] = 0
-        sprite_list[2] = 0
-        character.sprite = tuple(sprite_list)
 
 
 def random_walk(character):
@@ -104,12 +83,9 @@ class Enemy:
     speedx: int = 0
     speedy: int = 0
 
-    def rand_vel(self):
+    def walk(self):
         self.speedx = pyxel.rndi(-1, 1)
         self.speedy = pyxel.rndi(-1, 1)
-
-    def walk(self):
-        self.rand_vel()
         self.x %= pyxel.width
         self.y %= pyxel.height
 
@@ -118,7 +94,8 @@ class Enemy:
 class Projectile:
     x: int
     y: int
-    sprite: SPRITE_TYPE
+    sprite: SPRITE_TYPE | None = None
+    sprite_list: Tuple[SPRITE_TYPE] | None = None
     speedx: int = 0
     speedy: int = 0
     duration: int = 30

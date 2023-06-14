@@ -2,8 +2,9 @@ from typing import Callable, Generator, Tuple
 import pyxel
 
 from map_gen import map_seed
-from entity import Enemy, Player, Projectile, verifyCollision, changeSprite, Item, playerController, addItem
-from sprites import ATTACK, ENEMIE1, PLAYER, DOWN, ITEM
+from entity import (Enemy, Player, Projectile, verifyCollision,
+                    Item, player_controller, addItem)
+from sprites import ATTACK, ENEMIE1, PLAYER, DOWN, Items
 
 
 class PlayerHUD:
@@ -33,24 +34,22 @@ class PlayerHUD:
 
 class App:
     def __init__(self):
+        pyxel.init(160, 120)
+        pyxel.load("assets/pyxel.pyxres")
+        self. restart()
+        pyxel.run(self.update, self.draw)
+
+    def restart(self):
         self.entities = []
         self._trash = set()
         self.player_hud = PlayerHUD()
 
         self.player = Player(80, 60, PLAYER[DOWN])
-        self.player.inventory = []
         self.direction = DOWN
-        test_enemy = Enemy(10, 10, ENEMIE1[DOWN])
-        self.entities.append(test_enemy)
-
         self.last_spawn = 0
 
-        pyxel.init(160, 120)
-        pyxel.load("assets/pyxel.pyxres")
         map_entities = map_seed()
         self.entities += map_entities
-
-        pyxel.run(self.update, self.draw)
 
     def spawn_enemy(self):
         enemy_count = len([enemy for enemy in self.filter_entities(Enemy)])
@@ -67,12 +66,7 @@ class App:
     def kill(self, entity_id) -> None:
         self._trash.add(entity_id)
 
-    def update(self):
-
-        playerController(self)
-
-        self.spawn_enemy()
-
+    def entities_collision(self):
         for entity_id, projectile in self.filter_entities(Projectile):
             projectile.duration -= 1
             projectile.x += projectile.speedx
@@ -96,8 +90,14 @@ class App:
             for project_id, projectile in self.filter_entities(Projectile):
                 if verifyCollision(enemy, projectile):
                     self.kill(entity_id)
-                    item = Item(enemy.x, enemy.y, ITEM['blade'])
+                    item = Item(enemy.x, enemy.y, Items.blade)
                     self.entities.append(item)
+
+    def update(self):
+        player_controller(self)
+        self.entities_collision()
+
+        self.spawn_enemy()
 
         trash = reversed(sorted(self._trash))
         for entity_id in trash:
@@ -114,10 +114,13 @@ class App:
         pyxel.blt(self.player.x, self.player.y, *self.player.sprite)
 
         for entity in self.entities:
+            if hasattr(entity, 'sprite_list'):
+                frames_per_sprite = 3
+                sprite_frame = pyxel.frame_count % len(
+                    entity.sprite_list) * frames_per_sprite
+                sprite_i = sprite_frame // frames_per_sprite
+                entity.sprite = entity.sprite_list[sprite_i]
             pyxel.blt(entity.x, entity.y, *entity.sprite)
-
-        for entity_id, attack in self.filter_entities(Projectile):
-            changeSprite(attack)
 
         vida_texto = "Vida: {}".format(self.player.vida)
         pyxel.text(10, 10, vida_texto, 7)
@@ -134,7 +137,7 @@ class App:
         new_x = self.player.x + new_speedx
         new_y = self.player.y + new_speedy
 
-        attack = Projectile(new_x, new_y, ATTACK[0], speedx, speedy)
+        attack = Projectile(new_x, new_y, ATTACK[0], ATTACK, speedx, speedy)
         self.entities.append(attack)
 
 
