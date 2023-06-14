@@ -16,7 +16,7 @@ DOWN = Sides.DOWN
 
 SPRITE_TYPE = Tuple[int, int, int, int, int, int]
 
-COLKEY = 1
+COLKEY = 7
 
 ATTACK = (
         (2, 0, 0, 8, 8, 0),

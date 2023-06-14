@@ -114,7 +114,7 @@ class App:
 
     def attack(self):
         speedx, speedy = self.direction.value
-
+        
         attack = Projectile(self.player.x, self.player.y, ATTACK[0], speedx, speedy)
         self.entities.append(attack)
 
