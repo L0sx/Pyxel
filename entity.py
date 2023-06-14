@@ -2,7 +2,27 @@ import pyxel
 
 from dataclasses import dataclass
 
-from sprites import SPRITE_TYPE, Sides
+from sprites import SPRITE_TYPE, Sides, PLAYER, LEFT, RIGHT, UP, DOWN
+
+def playerController(self):
+    if pyxel.btn(pyxel.KEY_LEFT):
+        self.player.x = (self.player.x - 1) % pyxel.width
+        self.player.sprite = PLAYER[LEFT]
+        self.direction = LEFT
+    if pyxel.btn(pyxel.KEY_RIGHT):
+        self.player.x = (self.player.x + 1) % pyxel.width
+        self.player.sprite = PLAYER[RIGHT]
+        self.direction = RIGHT
+    if pyxel.btn(pyxel.KEY_DOWN):
+        self.player.y = (self.player.y + 1) % pyxel.height
+        self.player.sprite = PLAYER[DOWN]
+        self.direction = DOWN
+    if pyxel.btn(pyxel.KEY_UP):
+        self.player.y = (self.player.y - 1) % pyxel.height
+        self.player.sprite = PLAYER[UP]
+        self.direction = UP
+    if pyxel.btnp(pyxel.KEY_A):
+        self.attack()
 
 
 def verifyCollision(objeto1, objeto2):
@@ -39,8 +59,9 @@ def random_walk(character):
     character.x = (character.x - pyxel.rndi(-1, 1)) % pyxel.width
     character.y = (character.y - pyxel.rndi(-1, 1)) % pyxel.width
 
-def add_to_inventory(character, item):
+def addItem(character, item):
     character.inventory.append(item)
+    print("itens:", character.inventory)
      
 
 
@@ -68,6 +89,7 @@ class Player:
     direct: Sides = Sides.DOWN
     is_alive: bool = True
     vida: int = 10
+    inventory: list = None
     
 
 

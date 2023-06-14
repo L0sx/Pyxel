@@ -2,8 +2,8 @@ from typing import Callable, Generator, Tuple
 import pyxel
 
 from map_gen import map_seed
-from entity import Enemy, Player, Projectile, verifyCollision, changeSprite, Item
-from sprites import ATTACK, ENEMIE1, PLAYER, LEFT, RIGHT, UP, DOWN, ITEM
+from entity import Enemy, Player, Projectile, verifyCollision, changeSprite, Item, playerController, addItem
+from sprites import ATTACK, ENEMIE1, PLAYER, DOWN, ITEM
 
 
 class PlayerHUD:
@@ -32,6 +32,7 @@ class App:
         self.player_hud = PlayerHUD()
 
         self.player = Player(80, 60, PLAYER[DOWN])
+        self.player.inventory = []
         self.direction = DOWN
         test_enemy = Enemy(10, 10, ENEMIE1[DOWN])
         self.entities.append(test_enemy)
@@ -61,24 +62,8 @@ class App:
         self._trash.add(entity_id)
 
     def update(self):
-        if pyxel.btn(pyxel.KEY_LEFT):
-            self.player.x = (self.player.x - 1) % pyxel.width
-            self.player.sprite = PLAYER[LEFT]
-            self.direction = LEFT
-        if pyxel.btn(pyxel.KEY_RIGHT):
-            self.player.x = (self.player.x + 1) % pyxel.width
-            self.player.sprite = PLAYER[RIGHT]
-            self.direction = RIGHT
-        if pyxel.btn(pyxel.KEY_DOWN):
-            self.player.y = (self.player.y + 1) % pyxel.height
-            self.player.sprite = PLAYER[DOWN]
-            self.direction = DOWN
-        if pyxel.btn(pyxel.KEY_UP):
-            self.player.y = (self.player.y - 1) % pyxel.height
-            self.player.sprite = PLAYER[UP]
-            self.direction = UP
-        if pyxel.btnp(pyxel.KEY_A):
-            self.attack()
+        
+        playerController(self)
 
         self.spawn_enemy()
 
@@ -112,6 +97,11 @@ class App:
         for entity_id in trash:
             del self.entities[entity_id]
             self._trash.remove(entity_id)
+            
+            for item_id, item in self.filter_entities(Item):
+                if verifyCollision(item, self.player):
+                    self.kill(item_id)
+                    addItem(self.player, item)
 
     def draw(self):
         pyxel.cls(1)
