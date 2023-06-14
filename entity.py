@@ -1,9 +1,13 @@
+import logging
 from typing import Tuple
 import pyxel
 
 from dataclasses import dataclass, field
 
 from sprites import SPRITE_TYPE, Sides, PLAYER, LEFT, RIGHT, UP, DOWN, Items
+
+
+log = logging.getLogger(__name__)
 
 
 def player_controller(self):
@@ -32,14 +36,10 @@ def verifyCollision(objeto1, objeto2):
             objeto1.x + objeto1.sprite[3] > objeto2.x and
             objeto1.y < objeto2.y + objeto2.sprite[4] and
             objeto1.y + objeto1.sprite[4] > objeto2.y):
+        log.debug(f"{type(objeto1)} - {type(objeto2)} colidiram um com o outro")
         return True
     else:
         return False
-
-
-def random_walk(character):
-    character.x = (character.x - pyxel.rndi(-1, 1)) % pyxel.width
-    character.y = (character.y - pyxel.rndi(-1, 1)) % pyxel.width
 
 
 def addItem(character, item):

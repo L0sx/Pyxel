@@ -1,4 +1,7 @@
+import logging
+
 from typing import Callable, Generator, Tuple
+
 import pyxel
 
 from map_gen import map_seed
@@ -8,14 +11,26 @@ from sprites import ATTACK, ENEMIE1, PLAYER, DOWN, Items
 from hud import PlayerHUD
 
 
+str_format = '%(asctime)s:%(name)s:%(levelname)s:%(message)s'
+formatter = logging.Formatter(str_format)
+logging.basicConfig(filename='game.log',
+                    encoding='utf-8', level=logging.DEBUG, format=str_format)
+log = logging.getLogger(__name__)
+ch = logging.StreamHandler()
+ch.setLevel(logging.INFO)
+ch.setFormatter(formatter)
+log.addHandler(ch)
+
+
 class App:
     def __init__(self):
+        log.debug("starting App")
         pyxel.init(160, 120)
         pyxel.load("assets/pyxel.pyxres")
-        self. restart()
+        self.reset()
         pyxel.run(self.update, self.draw)
 
-    def restart(self):
+    def reset(self):
         self.entities = []
         self._trash = set()
         self.player_hud = PlayerHUD()
@@ -28,6 +43,7 @@ class App:
         self.entities += map_entities
 
     def spawn_enemy(self):
+        log.debug("spawning enemie")
         enemy_count = len([enemy for enemy in self.filter_entities(Enemy)])
         if self.last_spawn + 10 < pyxel.frame_count and enemy_count < 10:
             self.last_spawn = pyxel.frame_count
@@ -41,6 +57,7 @@ class App:
 
     def kill(self, entity_id) -> None:
         self._trash.add(entity_id)
+        log.debug(f"entidade: {entity_id} foi movida para a lixeira")
 
     def entities_collision(self):
         for entity_id, projectile in self.filter_entities(Projectile):
@@ -69,21 +86,22 @@ class App:
                     item = Item(enemy.x, enemy.y, Items.blade)
                     self.entities.append(item)
 
+        for entity_id, item in self.filter_entities(Item):
+            if verifyCollision(item, self.player):
+                self.kill(entity_id)
+                self.player.inventory.append(item)
+                log.info(f"player pegou o item: {entity_id}")
+
     def update(self):
         player_controller(self)
         self.entities_collision()
-
         self.spawn_enemy()
 
         trash = reversed(sorted(self._trash))
         for entity_id in trash:
             del self.entities[entity_id]
             self._trash.remove(entity_id)
-
-            for item_id, item in self.filter_entities(Item):
-                if verifyCollision(item, self.player):
-                    self.kill(item_id)
-                    addItem(self.player, item)
+            log.debug(f"entidade: {entity_id} foi deletado")
 
     def draw(self):
         pyxel.cls(1)
