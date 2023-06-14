@@ -2,8 +2,8 @@ from typing import Callable, Generator, Tuple
 import pyxel
 
 from map_gen import map_seed
-from entity import Enemy, Player, Projectile, verifyCollision, changeSprite
-from sprites import ATTACK, ENEMIE1, PLAYER, LEFT, RIGHT, UP, DOWN
+from entity import Enemy, Player, Projectile, verifyCollision, changeSprite, Item
+from sprites import ATTACK, ENEMIE1, PLAYER, LEFT, RIGHT, UP, DOWN, ITEM
 
 
 
@@ -73,7 +73,6 @@ class App:
             projectile.y += projectile.speedy
             if projectile.duration <= 0:
                 self.kill(entity_id)
-    
 
         for entity_id, enemy in self.filter_entities(Enemy):
             enemy.x += enemy.speedx
@@ -90,7 +89,9 @@ class App:
                     enemy.x -= 5
             for project_id, projectile in self.filter_entities(Projectile):
                 if verifyCollision(enemy, projectile):
-                    self.kill(entity_id)       
+                    self.kill(entity_id)   
+                    item = Item(enemy.x, enemy.y, ITEM['blade'])
+                    self.entities.append(item)   
     
         trash = reversed(sorted(self._trash))
         for entity_id in trash:
@@ -114,8 +115,15 @@ class App:
 
     def attack(self):
         speedx, speedy = self.direction.value
+
+        multi = 8
+        new_speedx = speedx * multi
+        new_speedy = speedy * multi
+
+        new_x = self.player.x + new_speedx
+        new_y = self.player.y + new_speedy
         
-        attack = Projectile(self.player.x, self.player.y, ATTACK[0], speedx, speedy)
+        attack = Projectile(new_x, new_y, ATTACK[0], speedx, speedy)
         self.entities.append(attack)
 
 App()

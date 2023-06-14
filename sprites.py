@@ -39,6 +39,10 @@ ENEMIE1 = {
         DOWN : (0, 24, 0, 8, 8, COLKEY),
         }
 
+ITEM = {
+        "blade": (2, 40, 0, 8, 8, 15),
+}
+
 HOUSE = 0, 32, 0, 16, 16, COLKEY
 CARAMBA = 0, 0, 16, 8, 8, COLKEY
 

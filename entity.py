@@ -42,8 +42,7 @@ def random_walk(character):
 def add_to_inventory(character, item):
     character.inventory.append(item)
      
-def remove_from_inventory(character, item):
-     character.inventory.remove(item)
+
 
 def is_in_inventory(character, item):
      return item in character.inventory
