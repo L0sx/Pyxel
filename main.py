@@ -212,7 +212,9 @@ class App:
 
     def switch_screen(self, screen):
         if isinstance(screen, GameScreen):
+            player = self.game_screen.player
             self.game_screen = GameScreen(self)
+            self.game_screen.player = player
         self.current_screen = screen
         pass
 
