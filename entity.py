@@ -99,6 +99,23 @@ def levelUp(character):
         character.exp_para_upar = int(character.exp_progresso * character.exp_para_upar)
         print("upei", character)
 
+def exp_walk(self, orb):
+        player_x = self.player.x
+        player_y = self.player.y
+        object_x = orb.x
+        object_y = orb.y
+
+        distance = pyxel.sqrt((player_x - object_x) ** 2 + (player_y - object_y) ** 2)
+        
+        if distance > 0:
+            direction_x = (player_x - object_x) / distance
+            direction_y = (player_y - object_y) / distance
+            print(int(direction_x))
+            print(int(direction_y))
+
+            orb.x += round(direction_x)
+            orb.y += round(direction_y)
+
 
 def addItem(character, item):
     character.inventory.append(item)

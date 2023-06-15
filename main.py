@@ -6,7 +6,7 @@ import pyxel
 
 from map_gen import map_seed
 from entity import (Enemy, Player, Portal, Projectile, verifyCollision,
-                    Item, title_controller, player_controller, levelUp)
+                    Item, title_controller, player_controller, levelUp, exp_walk)
 from sprites import ATTACK, ENEMIE1, PLAYER, DOWN, PORTAL, TURRET, Items, EXP_ORB
 from hud import PlayerHUD
 
@@ -32,7 +32,6 @@ class TitleScreen:
             "credits"
             ]
         self.current_option = 0
-        pass
 
     def center_x_text(self, y, text, colkey=9, bg=None):
         x = pyxel.width / 2 - len(text) * 2
@@ -150,6 +149,7 @@ class GameScreen:
         
 
         for entity_id, item in self.filter_entities(Item):
+            exp_walk(self, item)
             if verifyCollision(item, self.player):
                 if item.exp > 0:
                     self.player.exp_atual += item.exp
@@ -208,7 +208,6 @@ class App:
         self.switch_screen(self.title_screen)
 
         pyxel.run(self.update, self.draw)
-        pass
 
     def switch_screen(self, screen):
         if isinstance(screen, GameScreen):
@@ -216,15 +215,12 @@ class App:
             self.game_screen = GameScreen(self)
             self.game_screen.player = player
         self.current_screen = screen
-        pass
 
     def update(self):
         self.current_screen.update()
-        pass
 
     def draw(self):
         self.current_screen.draw()
-        pass
 
 
 
