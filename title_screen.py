@@ -48,8 +48,10 @@ class App:
             pass
         if pyxel.btnp(pyxel.KEY_DOWN):
             self.current_option = (self.current_option + 1) % len(self.menu_options)
+            print(self.current_option)
         if pyxel.btnp(pyxel.KEY_UP):
             self.current_option = (self.current_option - 1) % len(self.menu_options)
+            print(self.current_option)
         if pyxel.btnp(pyxel.KEY_A):
             pass
 

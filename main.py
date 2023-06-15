@@ -6,7 +6,7 @@ import pyxel
 
 from map_gen import map_seed
 from entity import (Enemy, Player, Portal, Projectile, verifyCollision,
-                    Item, player_controller, levelUp)
+                    Item, title_controller, player_controller, levelUp)
 from sprites import ATTACK, ENEMIE1, PLAYER, DOWN, PORTAL, TURRET, Items
 from hud import PlayerHUD
 
@@ -22,15 +22,60 @@ ch.setFormatter(formatter)
 log.addHandler(ch)
 
 
-class App:
-    def __init__(self):
-        log.debug("starting App")
-        pyxel.init(160, 120)
-        pyxel.load("assets/pyxel.pyxres")
-        self.reset()
-        pyxel.run(self.update, self.draw)
+class TitleScreen:
+    
+    def __init__(self, app):
+        self.app = app
+        self.menu_options = [
+            "start",
+            "configs",
+            "credits"
+            ]
+        self.current_option = 0
+        pass
 
-    def reset(self):
+    def center_x_text(self, y, text, colkey=9, bg=None):
+        x = pyxel.width / 2 - len(text) * 2
+
+        if bg:
+            pyxel.rect(x-1, y-1, len(text) * 4 + 2, 5 + 2, bg)
+
+        pyxel.text(x, y, text, colkey)
+
+    def update(self):
+        title_controller(self)
+
+    def draw(self):
+        pyxel.cls(1)
+        for y in range(pyxel.height):
+            for x in range(pyxel.width):
+                n = pyxel.noise(x/20, y/20, pyxel.frame_count/ 40)
+                if n > 0.7:
+                    point_val = 1
+                elif n > 0.4:
+                    point_val = 2
+                elif n > 0.2:
+                    point_val = 3
+                elif n > 0:
+                    point_val = 4
+                elif n > -0.3:
+                    point_val = 5
+                elif n > -0.7:
+                    point_val = 6
+                else:
+                    point_val = 0
+
+                pyxel.pset(x, y, point_val)
+        first30 = pyxel.height * 0.3
+        self.center_x_text(first30 / 2, "TITULO DO JOGO", 9, 13)
+
+        for i, option in enumerate(self.menu_options):
+            color = pyxel.frame_count % 15 if i == self.current_option else 9
+            self.center_x_text(first30 + i*8, option, color, 12)
+
+class GameScreen:
+    def __init__(self, app):
+        self.app = app
         self.entities = []
         self._trash = set()
         self.player_hud = PlayerHUD()
@@ -44,6 +89,7 @@ class App:
 
         map_entities = map_seed()
         self.entities += map_entities
+        pass
 
     def spawn(self):
         enemy_count = len([enemy for enemy in self.filter_entities(Enemy)])
@@ -58,7 +104,7 @@ class App:
         if self.points >= 10 and not self.portal:
             log.info(f"points {self.points}")
             portal = Portal(pyxel.width // 2, pyxel.height // 2,
-                            PORTAL[0], PORTAL)
+                        PORTAL[0], PORTAL)
             self.entities.append(portal)
             self.portal = True
 
@@ -111,7 +157,7 @@ class App:
 
         for entity_id, portal in self.filter_entities(Portal):
             if verifyCollision(portal, self.player):
-                self.reset()
+                self.app.switch_screen(self.app.game_screen)
 
     def update(self):
         player_controller(self)
@@ -142,6 +188,27 @@ class App:
         pyxel.text(10, 10, vida_texto, 7)
 
         self.player_hud.drawn(self.player)
+
+class App:
+    def __init__(self):
+        log.debug("starting App")
+        pyxel.init(160, 120)
+        pyxel.load("assets/pyxel.pyxres")
+        self.title_screen = TitleScreen(self)
+        self.game_screen = GameScreen(self)
+        self.switch_screen(self.title_screen)
+
+        pyxel.run(self.update, self.draw)
+
+    def switch_screen(self, screen):
+        self.current_screen = screen
+
+    def update(self):
+        self.current_screen.update()
+
+    def draw(self):
+        self.current_screen.draw()
+
 
 
 App()

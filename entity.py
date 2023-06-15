@@ -9,6 +9,19 @@ from sprites import SPRITE_TYPE, Sides, PLAYER, LEFT, RIGHT, UP, DOWN, ATTACK
 
 log = logging.getLogger(__name__)
 
+def title_controller(self):
+        if pyxel.btnp(pyxel.KEY_LEFT):
+            pass
+        if pyxel.btnp(pyxel.KEY_RIGHT):
+            pass
+        if pyxel.btnp(pyxel.KEY_DOWN):
+            self.current_option = (self.current_option + 1) % len(self.menu_options)
+        if pyxel.btnp(pyxel.KEY_UP):
+            self.current_option = (self.current_option - 1) % len(self.menu_options)
+        if pyxel.btnp(pyxel.KEY_KP_ENTER):
+            if self.current_option == 0:
+                self.app.switch_screen(self.app.game_screen)
+
 
 def player_controller(self):
     if pyxel.btn(pyxel.KEY_LEFT):
