@@ -7,7 +7,7 @@ import pyxel
 from map_gen import map_seed
 from entity import (Enemy, Player, Portal, Projectile, verifyCollision,
                     Item, player_controller)
-from sprites import ATTACK, ENEMIE1, PLAYER, DOWN, PORTAL, Items
+from sprites import ATTACK, ENEMIE1, PLAYER, DOWN, PORTAL, TURRET, Items
 from hud import PlayerHUD
 
 
@@ -52,7 +52,7 @@ class App:
             self.last_spawn = pyxel.frame_count
             x = pyxel.rndi(0, pyxel.width)
             y = pyxel.rndi(0, pyxel.height)
-            new_enemy = Enemy(x, y, ENEMIE1[DOWN])
+            new_enemy = Enemy(x, y, TURRET[0], TURRET)
             self.entities.append(new_enemy)
 
         if self.points >= 10 and not self.portal:

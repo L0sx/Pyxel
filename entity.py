@@ -99,6 +99,7 @@ class Enemy:
     x: int
     y: int
     sprite: SPRITE_TYPE
+    sprite_list: Tuple[SPRITE_TYPE] | None = None
     speedx: int = 0
     speedy: int = 0
 
