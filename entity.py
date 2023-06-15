@@ -28,12 +28,29 @@ def player_controller(self):
         self.player.sprite = PLAYER[UP]
         self.direction = UP
     if pyxel.btnp(pyxel.KEY_A):
-        self.attack()
+        self.entities += a_button(self)
     if pyxel.btnp(pyxel.KEY_SPACE):
-        self.entities += boom(self.player.x, self.player.y)
+        self.entities += space_button(self)
+
+def a_button(self):
+    return_list = []
+    speedx, speedy = self.direction.value
+
+    multi = 8
+    new_speedx = speedx * multi
+    new_speedy = speedy * multi
+
+    new_x = self.player.x + new_speedx
+    new_y = self.player.y + new_speedy
+        
+    damage = self.player.atk
+        
+    attack = Projectile(new_x, new_y, ATTACK[0], ATTACK, speedx, speedy, damage=damage)
+    return_list.append(attack)
+    return return_list
 
 
-def boom(x, y):
+def space_button(self):
     return_list = []
     for side in Sides:
         speedx, speedy = side.value
@@ -42,10 +59,12 @@ def boom(x, y):
         new_speedx = speedx * multi
         new_speedy = speedy * multi
 
-        new_x = x + new_speedx
-        new_y = y + new_speedy
+        new_x = self.player.x + new_speedx
+        new_y = self.player.y + new_speedy
 
-        attack = Projectile(new_x, new_y, ATTACK[0], ATTACK, speedx, speedy)
+        damage = self.player.atk
+
+        attack = Projectile(new_x, new_y, ATTACK[0], ATTACK, speedx, speedy, damage=damage)
         return_list.append(attack)
     return return_list
 
@@ -59,6 +78,13 @@ def verifyCollision(objeto1, objeto2):
         return True
     else:
         return False
+    
+def levelUp(character):
+    if character.exp_atual == character.exp_para_upar or character.exp_atual > character.exp_para_upar:
+        character.level += 1
+        character.exp_atual = 0
+        character.exp_para_upar = int(character.exp_progresso * character.exp_para_upar)
+        print("upei", character)
 
 
 def addItem(character, item):
@@ -84,7 +110,7 @@ class Player:
     y: int
     sprite: SPRITE_TYPE
     speed: int = 0
-    atk: int = 0
+    atk: int = 1
     strength: int = 0
     dexterity: int = 0
     intelligence: int = 0
@@ -92,6 +118,11 @@ class Player:
     is_alive: bool = True
     vida: int = 10
     inventory: list = field(default_factory=list)
+    level: int = 1
+    exp_atual: int = 0
+    exp_para_upar: int = 10
+    exp_rate: int = 1
+    exp_progresso: float = 3.14
 
 
 @dataclass
@@ -102,6 +133,8 @@ class Enemy:
     sprite_list: Tuple[SPRITE_TYPE] | None = None
     speedx: int = 0
     speedy: int = 0
+    exp: int = 1
+    vida: int = 10
 
     def walk(self):
         self.speedx = pyxel.rndi(-1, 1)
@@ -120,6 +153,7 @@ class Projectile:
     speedy: int = 0
     duration: int = 30
     angle: int = 0
+    damage: int = 0
 
 
 @dataclass

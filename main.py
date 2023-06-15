@@ -6,7 +6,7 @@ import pyxel
 
 from map_gen import map_seed
 from entity import (Enemy, Player, Portal, Projectile, verifyCollision,
-                    Item, player_controller)
+                    Item, player_controller, levelUp)
 from sprites import ATTACK, ENEMIE1, PLAYER, DOWN, PORTAL, TURRET, Items
 from hud import PlayerHUD
 
@@ -93,11 +93,15 @@ class App:
                     enemy.x -= 5
             for project_id, projectile in self.filter_entities(Projectile):
                 if verifyCollision(enemy, projectile):
+                    enemy.vida -=  projectile.damage
                     pyxel.play(0, 0)
-                    self.kill(entity_id)
-                    self.points += 1
-                    item = Item(enemy.x, enemy.y, Items.blade)
-                    self.entities.append(item)
+                    if enemy.vida <= 0:
+                        self.kill(entity_id)
+                        self.points += 1
+                        self.player.exp_atual += enemy.exp
+                        item = Item(enemy.x, enemy.y, Items.blade)
+                        self.entities.append(item)
+                        levelUp(self.player)
 
         for entity_id, item in self.filter_entities(Item):
             if verifyCollision(item, self.player):
@@ -113,6 +117,7 @@ class App:
         player_controller(self)
         self.entities_collision()
         self.spawn()
+
 
         trash = reversed(sorted(self._trash))
         for entity_id in trash:
@@ -137,19 +142,6 @@ class App:
         pyxel.text(10, 10, vida_texto, 7)
 
         self.player_hud.drawn(self.player)
-
-    def attack(self):
-        speedx, speedy = self.direction.value
-
-        multi = 8
-        new_speedx = speedx * multi
-        new_speedy = speedy * multi
-
-        new_x = self.player.x + new_speedx
-        new_y = self.player.y + new_speedy
-
-        attack = Projectile(new_x, new_y, ATTACK[0], ATTACK, speedx, speedy)
-        self.entities.append(attack)
 
 
 App()
