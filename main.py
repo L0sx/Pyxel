@@ -7,7 +7,7 @@ import pyxel
 from map_gen import map_seed
 from entity import (Enemy, Player, Portal, Projectile, verifyCollision,
                     Item, title_controller, player_controller, levelUp)
-from sprites import ATTACK, ENEMIE1, PLAYER, DOWN, PORTAL, TURRET, Items
+from sprites import ATTACK, ENEMIE1, PLAYER, DOWN, PORTAL, TURRET, Items, EXP_ORB
 from hud import PlayerHUD
 
 
@@ -139,21 +139,27 @@ class GameScreen:
                     enemy.x -= 5
             for project_id, projectile in self.filter_entities(Projectile):
                 if verifyCollision(enemy, projectile):
+                    self.kill(project_id)
                     enemy.vida -=  projectile.damage
                     pyxel.play(0, 0)
                     if enemy.vida <= 0:
                         self.kill(entity_id)
                         self.points += 1
-                        self.player.exp_atual += enemy.exp
-                        item = Item(enemy.x, enemy.y, Items.blade)
+                        item = Item(enemy.x, enemy.y, EXP_ORB[0], EXP_ORB, enemy.exp)
                         self.entities.append(item)
-                        levelUp(self.player)
+        
 
         for entity_id, item in self.filter_entities(Item):
             if verifyCollision(item, self.player):
-                self.kill(entity_id)
-                self.player.inventory.append(item)
-                log.debug(f"player pegou o item: {entity_id}")
+                if item.exp > 0:
+                    self.player.exp_atual += item.exp
+                    levelUp(self.player)
+                    self.kill(entity_id)
+                    log.debug(f"player ganhou {item.exp} de exp")
+                else:
+                    self.kill(entity_id)
+                    self.player.inventory.append(item)
+                    log.debug(f"player pegou o item: {entity_id}")
 
         for entity_id, portal in self.filter_entities(Portal):
             if verifyCollision(portal, self.player):

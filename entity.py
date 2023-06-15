@@ -102,7 +102,6 @@ def levelUp(character):
 
 def addItem(character, item):
     character.inventory.append(item)
-    print("itens:", character.inventory)
 
 
 def is_in_inventory(character, item):
@@ -174,6 +173,8 @@ class Item:
     x: int
     y: int
     sprite: SPRITE_TYPE
+    sprite_list: Tuple[SPRITE_TYPE] | None = None
+    exp: int = 0
 
 
 @dataclass
