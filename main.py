@@ -170,6 +170,9 @@ class GameScreen:
         self.entities_collision()
         self.spawn()
 
+        if self.player.vida <= 0:
+            self.app.switch_screen(self.app.title_screen)
+
 
         trash = reversed(sorted(self._trash))
         for entity_id in trash:
@@ -205,15 +208,21 @@ class App:
         self.switch_screen(self.title_screen)
 
         pyxel.run(self.update, self.draw)
+        pass
 
     def switch_screen(self, screen):
+        if isinstance(screen, GameScreen):
+            self.game_screen = GameScreen(self)
         self.current_screen = screen
+        pass
 
     def update(self):
         self.current_screen.update()
+        pass
 
     def draw(self):
         self.current_screen.draw()
+        pass
 
 
 
