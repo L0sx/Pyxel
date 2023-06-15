@@ -18,7 +18,7 @@ def title_controller(self):
             self.current_option = (self.current_option + 1) % len(self.menu_options)
         if pyxel.btnp(pyxel.KEY_UP):
             self.current_option = (self.current_option - 1) % len(self.menu_options)
-        if pyxel.btnp(pyxel.KEY_KP_ENTER):
+        if pyxel.btnp(pyxel.KEY_RETURN):
             if self.current_option == 0:
                 self.app.switch_screen(self.app.game_screen)
 
