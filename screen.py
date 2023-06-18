@@ -1,4 +1,3 @@
-from abc import ABC, abstractmethod
 import logging
 import pyxel
 from typing import Callable, Generator, Tuple
@@ -12,21 +11,10 @@ from hud import PlayerHUD
 log = logging.getLogger(__name__)
 
 
-class Screen(ABC):
-    @abstractmethod
-    def controller(self):
-        pass
-
-    def update(self):
-        self.controller()
-
-
 def center_x_text(y, text, colkey=9, bg=None):
     x = pyxel.width / 2 - len(text) * 2
-
     if bg:
         pyxel.rect(x-1, y-1, len(text) * 4 + 2, 5 + 2, bg)
-
     pyxel.text(x, y, text, colkey)
 
 
@@ -58,14 +46,6 @@ class TitleScreen:
                     self.app.switch_screen(CreditsScreen)
             # self.app.switch_screen(self.menu_options[self.current_option])
 
-    def center_x_text(self, y, text, colkey=9, bg=None):
-        x = pyxel.width / 2 - len(text) * 2
-
-        if bg:
-            pyxel.rect(x-1, y-1, len(text) * 4 + 2, 5 + 2, bg)
-
-        pyxel.text(x, y, text, colkey)
-
     def update(self):
         self.controller()
 
@@ -91,12 +71,12 @@ class TitleScreen:
 
                 pyxel.pset(x, y, point_val)
         first30 = pyxel.height * 0.3
-        self.center_x_text(first30 / 2, "TITULO DO JOGO", 9, 13)
+        center_x_text(first30 / 2, "TITULO DO JOGO", 9, 13)
 
         for i, option in enumerate(self.menu_options):
             color = pyxel.frame_count % 15 if i == self.current_option else 9
             option = option.name
-            self.center_x_text(first30 + i*8, option, color, 12)
+            center_x_text(first30 + i*8, option, color, 12)
 
 
 class CreditsScreen:
@@ -115,15 +95,7 @@ class CreditsScreen:
         if pyxel.btnp(pyxel.KEY_UP):
             pass
         if pyxel.btnp(pyxel.KEY_RETURN):
-            pass
-
-    def center_x_text(self, y, text, colkey=9, bg=None):
-        x = pyxel.width / 2 - len(text) * 2
-
-        if bg:
-            pyxel.rect(x-1, y-1, len(text) * 4 + 2, 5 + 2, bg)
-
-        pyxel.text(x, y, text, colkey)
+            self.app.switch_screen(TitleScreen)
 
     def update(self):
         self.controller()
@@ -157,10 +129,10 @@ class CreditsScreen:
         h = pyxel.height - ypadd * 2
         pyxel.rect(xpadd, ypadd, w, h, 5)
 
-        self.center_x_text(first30 / 2, "CREDITOS", 9, 13)
-        self.center_x_text(30, "FEITOR POR:", 9, 13)
-        self.center_x_text(40, "bhunao", 9, 13)
-        self.center_x_text(50, "l0s", 9, 13)
+        center_x_text(first30 / 2, "CREDITOS", 9, 13)
+        center_x_text(30, "FEITOR POR:", 9, 13)
+        center_x_text(40, "bhunao", 9, 13)
+        center_x_text(50, "los", 9, 13)
 
 
 class GameScreen:
