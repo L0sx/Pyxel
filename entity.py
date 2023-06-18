@@ -129,8 +129,8 @@ class Enemy:
     y: int
     sprite: SPRITE_TYPE
     sprite_list: Sequence[SPRITE_TYPE] | None = None
-    speedx: int = 0
-    speedy: int = 0
+    speedx: float = 0
+    speedy: float = 0
     exp: int = 1
     vida: int = 10
 

@@ -161,6 +161,8 @@ class GameScreen:
 
         map_entities = map_seed()
         self.entities += map_entities
+        boss = Enemy(0, 0, Inimigos.BOSS[0], Inimigos.BOSS, vida=level*10)
+        self.entities.append(boss)
 
     def spawn(self):
         enemy_count = len([enemy for enemy in self.filter_entities(Enemy)])
