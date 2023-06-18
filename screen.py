@@ -52,7 +52,7 @@ def title_controller(self):
                                1) % len(self.menu_options)
     if pyxel.btnp(pyxel.KEY_RETURN):
         if self.current_option == 0:
-            self.app.switch_screen(self.app.game_screen)
+            self.app.switch_screen(GameScreen)
 
 
 class TitleScreen:
@@ -75,6 +75,62 @@ class TitleScreen:
 
     def update(self):
         title_controller(self)
+
+    def draw(self):
+        pyxel.cls(1)
+        for y in range(pyxel.height):
+            for x in range(pyxel.width):
+                n = pyxel.noise(x/20, y/20, pyxel.frame_count / 40)
+                if n > 0.7:
+                    point_val = 1
+                elif n > 0.4:
+                    point_val = 2
+                elif n > 0.2:
+                    point_val = 3
+                elif n > 0:
+                    point_val = 4
+                elif n > -0.3:
+                    point_val = 5
+                elif n > -0.7:
+                    point_val = 6
+                else:
+                    point_val = 0
+
+                pyxel.pset(x, y, point_val)
+        first30 = pyxel.height * 0.3
+        self.center_x_text(first30 / 2, "TITULO DO JOGO", 9, 13)
+
+        for i, option in enumerate(self.menu_options):
+            color = pyxel.frame_count % 15 if i == self.current_option else 9
+            self.center_x_text(first30 + i*8, option, color, 12)
+
+
+class CreditsScreen:
+    def __init__(self, app):
+        self.app = app
+
+    def controller(self):
+        if pyxel.btnp(pyxel.KEY_ESCAPE):
+            self.app.switch_screen(GameScreen)
+        if pyxel.btnp(pyxel.KEY_RIGHT):
+            pass
+        if pyxel.btnp(pyxel.KEY_DOWN):
+            pass
+        if pyxel.btnp(pyxel.KEY_UP):
+            pass
+        if pyxel.btnp(pyxel.KEY_RETURN):
+            pass
+
+    def center_x_text(self, y, text, colkey=9, bg=None):
+        x = pyxel.width / 2 - len(text) * 2
+
+        if bg:
+            pyxel.rect(x-1, y-1, len(text) * 4 + 2, 5 + 2, bg)
+
+        pyxel.text(x, y, text, colkey)
+
+    def update(self):
+        self.controller(self)
 
     def draw(self):
         pyxel.cls(1)
@@ -213,7 +269,7 @@ class GameScreen:
 
         if self.player.vida <= 0:
             self.start()
-            self.app.switch_screen(self.app.title_screen)
+            self.app.switch_screen(TitleScreen)
 
         trash = reversed(sorted(self._trash))
         for entity_id in trash:

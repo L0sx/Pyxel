@@ -160,7 +160,6 @@ class Enemy:
     def walk(self):
         self.speedx = pyxel.sin(pyxel.frame_count % 360)
         self.speedy = pyxel.cos(pyxel.frame_count % 360)
-        print(f"{pyxel.sin(pyxel.frame_count)}, {pyxel.sin(pyxel.frame_count % 360)}")
         self.x %= pyxel.width
         self.y %= pyxel.height
 

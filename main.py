@@ -19,18 +19,19 @@ class App:
         log.debug("starting App")
         pyxel.init(160, 120)
         pyxel.load("assets/pyxel.pyxres")
-        self.title_screen = TitleScreen(self)
+        self.screens = {
+            TitleScreen: TitleScreen(self),
+            GameScreen: GameScreen(self),
+
+        }
+        self.current_screen = self.screens[TitleScreen]
         self.game_screen = GameScreen(self)
-        self.switch_screen(self.title_screen)
 
         pyxel.run(self.update, self.draw)
 
     def switch_screen(self, screen):
-        # if isinstance(screen, GameScreen):
-        #     player = self.game_screen.player
-        #     self.game_screen = GameScreen(self)
-        #     self.game_screen.player = player
-        self.current_screen = screen
+        print(screen, self.screens.keys())
+        self.current_screen = self.screens[screen]
 
     def update(self):
         self.current_screen.update()
