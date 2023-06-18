@@ -12,25 +12,6 @@ from hud import PlayerHUD
 log = logging.getLogger(__name__)
 
 
-COLKEY = 1
-
-SPRITEDOWN = 0, 0, 0, 8, 8, COLKEY
-SPRITEUP = 0, 8, 0, 8, 8, COLKEY
-SPRITELEFT = 0, 0, 8, 8, 8, COLKEY
-SPRITERIGHT = 0, 8, 8, 8, 8, COLKEY
-
-ENEMIE_1_DOWN = 0, 24, 0, 8, 8, COLKEY
-ENEMIE_1_UP = 0, 0, 0, 8, 8, COLKEY
-ENEMIE_1_LEFT = 0, 0, 0, 8, 8, COLKEY
-ENEMIE_1_RIGHT = 0, 0, 0, 8, 8, COLKEY
-
-HOUSE = 0, 32, 0, 16, 16, COLKEY
-CARAMBA = 0, 0, 16, 8, 8, COLKEY
-
-GRASS = 1, 32, 0, 8, 8, COLKEY
-TREE = 1, 40, 0, 8, 8, COLKEY
-
-
 class Screen(ABC):
     @abstractmethod
     def controller(self):
