@@ -1,10 +1,11 @@
+from abc import ABC, abstractmethod
 import logging
 import pyxel
 from typing import Callable, Generator, Tuple
 from map_gen import map_seed
 from entity import (Enemy, Player, Portal, Projectile, verifyCollision,
-                    Item, player_controller, levelUp, exp_walk)
-from sprites import DOWN
+                    Item, levelUp, exp_walk, space_button, a_button)
+from sprites import LEFT, RIGHT, UP, DOWN
 from sprites import Inimigos, Personagens, Objetos, Efeitos
 from hud import PlayerHUD
 
@@ -30,6 +31,15 @@ GRASS = 1, 32, 0, 8, 8, COLKEY
 TREE = 1, 40, 0, 8, 8, COLKEY
 
 
+class Screen(ABC):
+    @abstractmethod
+    def controller(self):
+        pass
+
+    def update(self):
+        self.controller()
+
+
 def center_x_text(y, text, colkey=9, bg=None):
     x = pyxel.width / 2 - len(text) * 2
 
@@ -39,31 +49,33 @@ def center_x_text(y, text, colkey=9, bg=None):
     pyxel.text(x, y, text, colkey)
 
 
-def title_controller(self):
-    if pyxel.btnp(pyxel.KEY_LEFT):
-        pass
-    if pyxel.btnp(pyxel.KEY_RIGHT):
-        pass
-    if pyxel.btnp(pyxel.KEY_DOWN):
-        self.current_option = (self.current_option +
-                               1) % len(self.menu_options)
-    if pyxel.btnp(pyxel.KEY_UP):
-        self.current_option = (self.current_option -
-                               1) % len(self.menu_options)
-    if pyxel.btnp(pyxel.KEY_RETURN):
-        if self.current_option == 0:
-            self.app.switch_screen(GameScreen)
-
-
 class TitleScreen:
     def __init__(self, app):
         self.app = app
         self.menu_options = [
-            "start",
-            "configs",
-            "credits"
+            GameScreen,
+            CreditsScreen,
         ]
         self.current_option = 0
+
+    def controller(self):
+        if pyxel.btnp(pyxel.KEY_LEFT):
+            pass
+        if pyxel.btnp(pyxel.KEY_RIGHT):
+            pass
+        if pyxel.btnp(pyxel.KEY_DOWN):
+            self.current_option = (self.current_option +
+                                   1) % len(self.menu_options)
+        if pyxel.btnp(pyxel.KEY_UP):
+            self.current_option = (self.current_option -
+                                   1) % len(self.menu_options)
+        if pyxel.btnp(pyxel.KEY_RETURN):
+            match self.current_option:
+                case 0:
+                    self.app.switch_screen(GameScreen)
+                case 1:
+                    self.app.switch_screen(CreditsScreen)
+            # self.app.switch_screen(self.menu_options[self.current_option])
 
     def center_x_text(self, y, text, colkey=9, bg=None):
         x = pyxel.width / 2 - len(text) * 2
@@ -74,7 +86,7 @@ class TitleScreen:
         pyxel.text(x, y, text, colkey)
 
     def update(self):
-        title_controller(self)
+        self.controller()
 
     def draw(self):
         pyxel.cls(1)
@@ -102,10 +114,13 @@ class TitleScreen:
 
         for i, option in enumerate(self.menu_options):
             color = pyxel.frame_count % 15 if i == self.current_option else 9
+            option = option.name
             self.center_x_text(first30 + i*8, option, color, 12)
 
 
 class CreditsScreen:
+    name = "Creditos"
+
     def __init__(self, app):
         self.app = app
 
@@ -130,7 +145,7 @@ class CreditsScreen:
         pyxel.text(x, y, text, colkey)
 
     def update(self):
-        self.controller(self)
+        self.controller()
 
     def draw(self):
         pyxel.cls(1)
@@ -154,14 +169,22 @@ class CreditsScreen:
 
                 pyxel.pset(x, y, point_val)
         first30 = pyxel.height * 0.3
-        self.center_x_text(first30 / 2, "TITULO DO JOGO", 9, 13)
 
-        for i, option in enumerate(self.menu_options):
-            color = pyxel.frame_count % 15 if i == self.current_option else 9
-            self.center_x_text(first30 + i*8, option, color, 12)
+        xpadd = pyxel.width // 10
+        ypadd = pyxel.height // 10
+        w = pyxel.width - xpadd * 2
+        h = pyxel.height - ypadd * 2
+        pyxel.rect(xpadd, ypadd, w, h, 5)
+
+        self.center_x_text(first30 / 2, "CREDITOS", 9, 13)
+        self.center_x_text(30, "FEITOR POR:", 9, 13)
+        self.center_x_text(40, "bhunao", 9, 13)
+        self.center_x_text(50, "l0s", 9, 13)
 
 
 class GameScreen:
+    name = "game"
+
     def __init__(self, app):
         self.app = app
         self.start()
@@ -262,8 +285,30 @@ class GameScreen:
             if verifyCollision(portal, self.player):
                 self.start(self.player, self.level+1)
 
+    def controller(self):
+        if pyxel.btn(pyxel.KEY_LEFT):
+            self.player.x = (self.player.x - 1) % pyxel.width
+            self.player.sprite = Personagens.PLAYER[LEFT]
+            self.direction = LEFT
+        if pyxel.btn(pyxel.KEY_RIGHT):
+            self.player.x = (self.player.x + 1) % pyxel.width
+            self.player.sprite = Personagens.PLAYER[RIGHT]
+            self.direction = RIGHT
+        if pyxel.btn(pyxel.KEY_DOWN):
+            self.player.y = (self.player.y + 1) % pyxel.height
+            self.player.sprite = Personagens.PLAYER[DOWN]
+            self.direction = DOWN
+        if pyxel.btn(pyxel.KEY_UP):
+            self.player.y = (self.player.y - 1) % pyxel.height
+            self.player.sprite = Personagens.PLAYER[UP]
+            self.direction = UP
+        if pyxel.btnp(pyxel.KEY_A):
+            self.entities += a_button(self)
+        if pyxel.btnp(pyxel.KEY_SPACE):
+            self.entities += space_button(self)
+
     def update(self):
-        player_controller(self)
+        self.controller()
         self.entities_collision()
         self.spawn()
 

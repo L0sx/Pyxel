@@ -1,6 +1,6 @@
 import logging
 import pyxel
-from screen import TitleScreen, GameScreen
+from screen import CreditsScreen, TitleScreen, GameScreen
 
 
 str_format = '%(asctime)s:%(name)s:%(levelname)s:%(message)s'
@@ -22,7 +22,7 @@ class App:
         self.screens = {
             TitleScreen: TitleScreen(self),
             GameScreen: GameScreen(self),
-
+            CreditsScreen: CreditsScreen(self),
         }
         self.current_screen = self.screens[TitleScreen]
         self.game_screen = GameScreen(self)

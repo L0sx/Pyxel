@@ -4,34 +4,11 @@ import pyxel
 
 from dataclasses import dataclass, field
 
-from sprites import SPRITE_TYPE, Sides, LEFT, RIGHT, UP, DOWN
-from sprites import Personagens, Efeitos
+from sprites import SPRITE_TYPE, Sides
+from sprites import Efeitos
 
 
 log = logging.getLogger(__name__)
-
-
-def player_controller(self):
-    if pyxel.btn(pyxel.KEY_LEFT):
-        self.player.x = (self.player.x - 1) % pyxel.width
-        self.player.sprite = Personagens.PLAYER[LEFT]
-        self.direction = LEFT
-    if pyxel.btn(pyxel.KEY_RIGHT):
-        self.player.x = (self.player.x + 1) % pyxel.width
-        self.player.sprite = Personagens.PLAYER[RIGHT]
-        self.direction = RIGHT
-    if pyxel.btn(pyxel.KEY_DOWN):
-        self.player.y = (self.player.y + 1) % pyxel.height
-        self.player.sprite = Personagens.PLAYER[DOWN]
-        self.direction = DOWN
-    if pyxel.btn(pyxel.KEY_UP):
-        self.player.y = (self.player.y - 1) % pyxel.height
-        self.player.sprite = Personagens.PLAYER[UP]
-        self.direction = UP
-    if pyxel.btnp(pyxel.KEY_A):
-        self.entities += a_button(self)
-    if pyxel.btnp(pyxel.KEY_SPACE):
-        self.entities += space_button(self)
 
 
 def a_button(self):
