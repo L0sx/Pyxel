@@ -26,10 +26,10 @@ class App:
         pyxel.run(self.update, self.draw)
 
     def switch_screen(self, screen):
-        if isinstance(screen, GameScreen):
-            player = self.game_screen.player
-            self.game_screen = GameScreen(self)
-            self.game_screen.player = player
+        # if isinstance(screen, GameScreen):
+        #     player = self.game_screen.player
+        #     self.game_screen = GameScreen(self)
+        #     self.game_screen.player = player
         self.current_screen = screen
 
     def update(self):

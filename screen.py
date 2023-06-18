@@ -108,12 +108,18 @@ class TitleScreen:
 class GameScreen:
     def __init__(self, app):
         self.app = app
+        self.start()
+
+    def start(self, player=None):
+        if not player:
+            player = Player(80, 60, Personagens.PLAYER[DOWN])
+
+        self.player = player
         self.entities = []
         self._trash = set()
         self.player_hud = PlayerHUD()
         self.bg_color = pyxel.rndi(0, 15)
 
-        self.player = Player(80, 60, Personagens.PLAYER[DOWN])
         self.direction = DOWN
         self.points = 0
         self.last_spawn = 0
@@ -121,7 +127,6 @@ class GameScreen:
 
         map_entities = map_seed()
         self.entities += map_entities
-        pass
 
     def spawn(self):
         enemy_count = len([enemy for enemy in self.filter_entities(Enemy)])
@@ -204,6 +209,7 @@ class GameScreen:
         self.spawn()
 
         if self.player.vida <= 0:
+            self.start()
             self.app.switch_screen(self.app.title_screen)
 
         trash = reversed(sorted(self._trash))
