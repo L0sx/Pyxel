@@ -110,7 +110,8 @@ class GameScreen:
         self.app = app
         self.start()
 
-    def start(self, player=None):
+    def start(self, player=None, level=1):
+        log.info(f"iniciando level {level}")
         if not player:
             player = Player(80, 60, Personagens.PLAYER[DOWN])
 
@@ -122,6 +123,7 @@ class GameScreen:
 
         self.direction = DOWN
         self.points = 0
+        self.level = level
         self.last_spawn = 0
         self.portal = False
 
@@ -135,7 +137,8 @@ class GameScreen:
             self.last_spawn = pyxel.frame_count
             x = pyxel.rndi(0, pyxel.width)
             y = pyxel.rndi(0, pyxel.height)
-            new_enemy = Enemy(x, y, Inimigos.TURRET[0], Inimigos.TURRET)
+            new_enemy = Enemy(
+                x, y, Inimigos.TURRET[0], Inimigos.TURRET, vida=self.level)
             self.entities.append(new_enemy)
 
         if self.points >= 10 and not self.portal:
@@ -201,7 +204,7 @@ class GameScreen:
 
         for entity_id, portal in self.filter_entities(Portal):
             if verifyCollision(portal, self.player):
-                self.app.switch_screen(self.app.game_screen)
+                self.start(self.player, self.level+1)
 
     def update(self):
         player_controller(self)

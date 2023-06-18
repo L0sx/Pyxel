@@ -90,7 +90,7 @@ def levelUp(character):
         character.exp_atual = 0
         character.exp_para_upar = int(
             character.exp_progresso * character.exp_para_upar)
-        print("upei", character)
+        log.info(f"personagem upou {character}")
 
 
 def exp_walk(self, orb):
@@ -105,9 +105,6 @@ def exp_walk(self, orb):
     if distance > 0:
         direction_x = (player_x - object_x) / distance
         direction_y = (player_y - object_y) / distance
-        print(int(direction_x))
-        print(int(direction_y))
-
         orb.x += round(direction_x)
         orb.y += round(direction_y)
 
@@ -161,8 +158,9 @@ class Enemy:
     vida: int = 10
 
     def walk(self):
-        self.speedx = pyxel.rndi(-1, 1)
-        self.speedy = pyxel.rndi(-1, 1)
+        self.speedx = pyxel.sin(pyxel.frame_count % 360)
+        self.speedy = pyxel.cos(pyxel.frame_count % 360)
+        print(f"{pyxel.sin(pyxel.frame_count)}, {pyxel.sin(pyxel.frame_count % 360)}")
         self.x %= pyxel.width
         self.y %= pyxel.height
 
