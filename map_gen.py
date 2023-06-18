@@ -3,7 +3,7 @@ import pyxel
 from typing import List
 
 from entity import Object
-from sprites import TREE, GRASS
+from sprites import Objetos
 
 
 def proximos(entities, x, y, distance=10, name=None) -> int:
@@ -22,11 +22,11 @@ def map_seed() -> List[Object]:
             if n > 0.7:
                 point_val = 1
                 if not proximos(entities, x, y, 15, "tree"):
-                    tree = Object(x, y, TREE, "tree")
+                    tree = Object(x, y, Objetos.TREE, "tree")
                     entities.append(tree)
             elif n > 0.4:
                 if not proximos(entities, x, y, 15, "grass"):
-                    grass = Object(x, y, GRASS, "grass")
+                    grass = Object(x, y, Objetos.GRASS, "grass")
                     entities.append(grass)
                     pass
                 point_val = 2

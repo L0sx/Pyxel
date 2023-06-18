@@ -1,49 +1,38 @@
 import logging
-from typing import Tuple
+from typing import Sequence
 import pyxel
 
 from dataclasses import dataclass, field
 
-from sprites import SPRITE_TYPE, Sides, PLAYER, LEFT, RIGHT, UP, DOWN, ATTACK
+from sprites import SPRITE_TYPE, Sides, LEFT, RIGHT, UP, DOWN
+from sprites import Personagens, Efeitos
 
 
 log = logging.getLogger(__name__)
-
-def title_controller(self):
-        if pyxel.btnp(pyxel.KEY_LEFT):
-            pass
-        if pyxel.btnp(pyxel.KEY_RIGHT):
-            pass
-        if pyxel.btnp(pyxel.KEY_DOWN):
-            self.current_option = (self.current_option + 1) % len(self.menu_options)
-        if pyxel.btnp(pyxel.KEY_UP):
-            self.current_option = (self.current_option - 1) % len(self.menu_options)
-        if pyxel.btnp(pyxel.KEY_RETURN):
-            if self.current_option == 0:
-                self.app.switch_screen(self.app.game_screen)
 
 
 def player_controller(self):
     if pyxel.btn(pyxel.KEY_LEFT):
         self.player.x = (self.player.x - 1) % pyxel.width
-        self.player.sprite = PLAYER[LEFT]
+        self.player.sprite = Personagens.PLAYER[LEFT]
         self.direction = LEFT
     if pyxel.btn(pyxel.KEY_RIGHT):
         self.player.x = (self.player.x + 1) % pyxel.width
-        self.player.sprite = PLAYER[RIGHT]
+        self.player.sprite = Personagens.PLAYER[RIGHT]
         self.direction = RIGHT
     if pyxel.btn(pyxel.KEY_DOWN):
         self.player.y = (self.player.y + 1) % pyxel.height
-        self.player.sprite = PLAYER[DOWN]
+        self.player.sprite = Personagens.PLAYER[DOWN]
         self.direction = DOWN
     if pyxel.btn(pyxel.KEY_UP):
         self.player.y = (self.player.y - 1) % pyxel.height
-        self.player.sprite = PLAYER[UP]
+        self.player.sprite = Personagens.PLAYER[UP]
         self.direction = UP
     if pyxel.btnp(pyxel.KEY_A):
         self.entities += a_button(self)
     if pyxel.btnp(pyxel.KEY_SPACE):
         self.entities += space_button(self)
+
 
 def a_button(self):
     return_list = []
@@ -55,10 +44,11 @@ def a_button(self):
 
     new_x = self.player.x + new_speedx
     new_y = self.player.y + new_speedy
-        
+
     damage = self.player.atk
-        
-    attack = Projectile(new_x, new_y, ATTACK[0], ATTACK, speedx, speedy, damage=damage)
+
+    attack = Projectile(
+        new_x, new_y, Efeitos.ATTACK[0], Efeitos.ATTACK, speedx, speedy, damage=damage)
     return_list.append(attack)
     return return_list
 
@@ -77,7 +67,8 @@ def space_button(self):
 
         damage = self.player.atk
 
-        attack = Projectile(new_x, new_y, ATTACK[0], ATTACK, speedx, speedy, damage=damage)
+        attack = Projectile(
+            new_x, new_y, Efeitos.ATTACK[0], Efeitos.ATTACK, speedx, speedy, damage=damage)
         return_list.append(attack)
     return return_list
 
@@ -91,30 +82,34 @@ def verifyCollision(objeto1, objeto2):
         return True
     else:
         return False
-    
+
+
 def levelUp(character):
     if character.exp_atual == character.exp_para_upar or character.exp_atual > character.exp_para_upar:
         character.level += 1
         character.exp_atual = 0
-        character.exp_para_upar = int(character.exp_progresso * character.exp_para_upar)
+        character.exp_para_upar = int(
+            character.exp_progresso * character.exp_para_upar)
         print("upei", character)
 
+
 def exp_walk(self, orb):
-        player_x = self.player.x
-        player_y = self.player.y
-        object_x = orb.x
-        object_y = orb.y
+    player_x = self.player.x
+    player_y = self.player.y
+    object_x = orb.x
+    object_y = orb.y
 
-        distance = pyxel.sqrt((player_x - object_x) ** 2 + (player_y - object_y) ** 2)
-        
-        if distance > 0:
-            direction_x = (player_x - object_x) / distance
-            direction_y = (player_y - object_y) / distance
-            print(int(direction_x))
-            print(int(direction_y))
+    distance = pyxel.sqrt((player_x - object_x) ** 2 +
+                          (player_y - object_y) ** 2)
 
-            orb.x += round(direction_x)
-            orb.y += round(direction_y)
+    if distance > 0:
+        direction_x = (player_x - object_x) / distance
+        direction_y = (player_y - object_y) / distance
+        print(int(direction_x))
+        print(int(direction_y))
+
+        orb.x += round(direction_x)
+        orb.y += round(direction_y)
 
 
 def addItem(character, item):
@@ -159,7 +154,7 @@ class Enemy:
     x: int
     y: int
     sprite: SPRITE_TYPE
-    sprite_list: Tuple[SPRITE_TYPE] | None = None
+    sprite_list: Sequence[SPRITE_TYPE] | None = None
     speedx: int = 0
     speedy: int = 0
     exp: int = 1
@@ -177,7 +172,7 @@ class Projectile:
     x: int
     y: int
     sprite: SPRITE_TYPE | None = None
-    sprite_list: Tuple[SPRITE_TYPE] | None = None
+    sprite_list: Sequence[SPRITE_TYPE] | None = None
     speedx: int = 0
     speedy: int = 0
     duration: int = 30
@@ -190,7 +185,7 @@ class Item:
     x: int
     y: int
     sprite: SPRITE_TYPE
-    sprite_list: Tuple[SPRITE_TYPE] | None = None
+    sprite_list: Sequence[SPRITE_TYPE] | None = None
     exp: int = 0
 
 
@@ -199,4 +194,4 @@ class Portal:
     x: int
     y: int
     sprite: SPRITE_TYPE
-    sprite_list: Tuple[SPRITE_TYPE] | None = None
+    sprite_list: Sequence[SPRITE_TYPE] | None = None

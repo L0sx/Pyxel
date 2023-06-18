@@ -1,8 +1,10 @@
 from enum import Enum
 from typing import Tuple
+from typing import Sequence
 
 
-SPRITE_TYPE = Tuple[int, int, int, int, int, int]
+SPRITE_TYPE = Tuple[int, int, int, int, int, int] | Sequence[int]
+COLKEY = 7
 
 
 class Sides(Enum):
@@ -22,55 +24,55 @@ UP = Sides.UP
 DOWN = Sides.DOWN
 
 
-COLKEY = 7
-
-ATTACK = (
-    (2, 0, 0, 8, 8, 0),
-    (2, 8, 0, 8, 8, 0),
-    (2, 0, 8, 8, 8, 0),
-    (2, 8, 8, 8, 8, 0),
-)
-
-PLAYER = {
-    LEFT: (0, 0, 8, 8, 8, COLKEY),
-    RIGHT: (0, 8, 8, 8, 8, COLKEY),
-    UP: (0, 8, 0, 8, 8, COLKEY),
-    DOWN: (0, 0, 0, 8, 8, COLKEY),
-}
-
-ENEMIE1 = {
-    LEFT: (0, 0, 0, 8, 8, COLKEY),
-    RIGHT: (0, 0, 0, 8, 8, COLKEY),
-    UP: (0, 0, 0, 8, 8, COLKEY),
-    DOWN: (0, 24, 0, 8, 8, 1),
-}
+class Inimigos:
+    TURRET = (
+        (0, 0, 48, 8, 8, COLKEY),
+        (0, 8, 48, 8, 8, COLKEY),
+        (0, 0, 56, 8, 8, COLKEY),
+        (0, 8, 56, 8, 8, COLKEY),
+    )
 
 
-class Items:
-    blade = 2, 40, 0, 8, 8, 15
-
-EXP_ORB = (
+class Efeitos:
+    ATTACK = (
+        (2, 0, 0, 8, 8, 0),
+        (2, 8, 0, 8, 8, 0),
+        (2, 0, 8, 8, 8, 0),
+        (2, 8, 8, 8, 8, 0),
+    )
+    EXP_ORB = (
         (2, 16, 16, 8, 8, 15),
         (2, 24, 16, 8, 8, 15),
         (2, 16, 24, 8, 8, 15),
         (2, 24, 24, 8, 8, 15)
-)
+    )
 
 
-HOUSE = 0, 32, 0, 16, 16, COLKEY
-CARAMBA = 0, 0, 16, 8, 8, COLKEY
+class Personagens:
+    PLAYER = {
+        LEFT: (0, 0, 8, 8, 8, COLKEY),
+        RIGHT: (0, 8, 8, 8, 8, COLKEY),
+        UP: (0, 8, 0, 8, 8, COLKEY),
+        DOWN: (0, 0, 0, 8, 8, COLKEY),
+    }
+    ENEMIE1 = {
+        LEFT: (0, 0, 0, 8, 8, COLKEY),
+        RIGHT: (0, 0, 0, 8, 8, COLKEY),
+        UP: (0, 0, 0, 8, 8, COLKEY),
+        DOWN: (0, 24, 0, 8, 8, 1),
+    }
 
-GRASS = 1, 32, 0, 8, 8, COLKEY
-TREE = 1, 40, 0, 8, 8, COLKEY
 
-PORTAL = (
-    (1, 32, 8, 8, 8, COLKEY),
-    (1, 40, 8, 8, 8, COLKEY),
-)
+class Objetos:
+    HOUSE = 0, 32, 0, 16, 16, COLKEY
+    CARAMBA = 0, 0, 16, 8, 8, COLKEY
+    GRASS = 1, 32, 0, 8, 8, COLKEY
+    TREE = 1, 40, 0, 8, 8, COLKEY
+    PORTAL = (
+        (1, 32, 8, 8, 8, COLKEY),
+        (1, 40, 8, 8, 8, COLKEY),
+    )
 
-TURRET = (
-    (0, 0, 48, 8, 8, COLKEY),
-    (0, 8, 48, 8, 8, COLKEY),
-    (0, 0, 56, 8, 8, COLKEY),
-    (0, 8, 56, 8, 8, COLKEY),
-)
+
+class Items:
+    blade = 2, 40, 0, 8, 8, 15
