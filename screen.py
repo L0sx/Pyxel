@@ -145,7 +145,8 @@ class GameScreen:
     def start(self, player=None, level=1):
         log.info(f"iniciando level {level}")
         if not player:
-            player = Player(80, 60, Personagens.PLAYER[DOWN])
+            player = Player(pyxel.width // 2, pyxel.height //
+                            2, Personagens.PLAYER[DOWN])
 
         self.player = player
         self.entities = []
@@ -163,6 +164,8 @@ class GameScreen:
         self.entities += map_entities
         boss = Enemy(0, 0, Inimigos.BOSS[0], Inimigos.BOSS, vida=level*10)
         self.entities.append(boss)
+
+        self.camera = [0, 0]
 
     def spawn(self):
         enemy_count = len([enemy for enemy in self.filter_entities(Enemy)])
@@ -206,10 +209,12 @@ class GameScreen:
                 if self.player.x < enemy.x:
                     self.player.vida -= 1
                     self.player.x -= 5
+                    self.camera[0] -= 5
                     enemy.x += 5
                 else:
                     self.player.vida -= 1
                     self.player.x += 5
+                    self.camera[0] += 5
                     enemy.x -= 5
             for project_id, projectile in self.filter_entities(Projectile):
                 if verifyCollision(enemy, projectile):
@@ -241,25 +246,37 @@ class GameScreen:
                 self.start(self.player, self.level+1)
 
     def controller(self):
-        if pyxel.btn(pyxel.KEY_LEFT):
-            self.player.x = (self.player.x - 1) % pyxel.width
+        for at in dir(pyxel):
+            if "GAMEPAD" in at:
+                attr = getattr(pyxel, at)
+                bo = pyxel.btn(attr)
+                if bo:
+                    print(attr, at, bo)
+
+        print(pyxel.GAMEPAD1_BUTTON_A, pyxel.GAMEPAD1_BUTTON_DPAD_LEFT)
+        if pyxel.btn(pyxel.KEY_LEFT) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_LEFT):
+            self.player.x = (self.player.x - 1)
             self.player.sprite = Personagens.PLAYER[LEFT]
             self.direction = LEFT
-        if pyxel.btn(pyxel.KEY_RIGHT):
-            self.player.x = (self.player.x + 1) % pyxel.width
+            self.camera[0] -= 1
+        if pyxel.btn(pyxel.KEY_RIGHT) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_RIGHT):
+            self.player.x = (self.player.x + 1)
             self.player.sprite = Personagens.PLAYER[RIGHT]
             self.direction = RIGHT
-        if pyxel.btn(pyxel.KEY_DOWN):
-            self.player.y = (self.player.y + 1) % pyxel.height
+            self.camera[0] += 1
+        if pyxel.btn(pyxel.KEY_DOWN) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_DOWN):
+            self.player.y = (self.player.y + 1)
             self.player.sprite = Personagens.PLAYER[DOWN]
             self.direction = DOWN
-        if pyxel.btn(pyxel.KEY_UP):
-            self.player.y = (self.player.y - 1) % pyxel.height
+            self.camera[1] += 1
+        if pyxel.btn(pyxel.KEY_UP) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_UP):
+            self.player.y = (self.player.y - 1)
             self.player.sprite = Personagens.PLAYER[UP]
             self.direction = UP
-        if pyxel.btnp(pyxel.KEY_A):
+            self.camera[1] -= 1
+        if pyxel.btnp(pyxel.KEY_A) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_A):
             self.entities += a_button(self)
-        if pyxel.btnp(pyxel.KEY_SPACE):
+        if pyxel.btnp(pyxel.KEY_SPACE) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_X):
             self.entities += space_button(self)
 
     def update(self):
@@ -278,6 +295,7 @@ class GameScreen:
             log.debug(f"entidade: {entity_id} foi deletado")
 
     def draw(self):
+        pyxel.camera(*self.camera)
         pyxel.cls(self.bg_color)
         pyxel.blt(self.player.x, self.player.y, *self.player.sprite)
 

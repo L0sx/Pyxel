@@ -16,8 +16,8 @@ def proximos(entities, x, y, distance=10, name=None) -> int:
 
 def map_seed() -> List[Object]:
     entities = []
-    for y in range(pyxel.height):
-        for x in range(pyxel.width):
+    for y in range(pyxel.height * 3):
+        for x in range(pyxel.width * 3):
             n = pyxel.noise(x/20, y/20, pyxel.frame_count)
             if n > 0.7:
                 point_val = 1
