@@ -7,6 +7,25 @@ SPRITE_TYPE = Tuple[int, int, int, int, int, int] | Sequence[int]
 COLKEY = 7
 
 
+class Colors:
+    BLACK = 0
+    BLUE1 = 1
+    PURPLE = 2
+    PISCINA = 3
+    MARROM = 4
+    BLUE2 = 5
+    BLUE3 = 6
+    WHITE = 7
+    PINK = 8
+    ORANGE = 9
+    YELLOW = 10
+    GREEN = 11
+    BLUE4 = 12
+    GRAY = 13
+    SALMON = 14
+    BEGE = 15
+
+
 class Sides(Enum):
     LEFT = -1, 0
     RIGHT = 1, 0
