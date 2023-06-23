@@ -248,41 +248,6 @@ class GameScreen:
                 self.start(self.player, self.level+1)
 
     def controller(self):
-<<<<<<< HEAD
-        for at in dir(pyxel):
-            if "GAMEPAD" in at:
-                attr = getattr(pyxel, at)
-                bo = pyxel.btn(attr)
-                if bo:
-                    print(attr, at, bo)
-
-        print(pyxel.GAMEPAD1_BUTTON_A, pyxel.GAMEPAD1_BUTTON_DPAD_LEFT)
-        print(pyxel.btnv(pyxel.GAMEPAD2_AXIS_LEFTX),
-              pyxel.btnv(pyxel.GAMEPAD1_AXIS_LEFTY))
-        if pyxel.btn(pyxel.KEY_LEFT) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_LEFT):
-            self.player.x = (self.player.x - 1)
-            self.player.sprite = Personagens.PLAYER[LEFT]
-            self.direction = LEFT
-            self.camera[0] -= 1
-        if pyxel.btn(pyxel.KEY_RIGHT) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_RIGHT):
-            self.player.x = (self.player.x + 1)
-            self.player.sprite = Personagens.PLAYER[RIGHT]
-            self.direction = RIGHT
-            self.camera[0] += 1
-        if pyxel.btn(pyxel.KEY_DOWN) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_DOWN):
-            self.player.y = (self.player.y + 1)
-            self.player.sprite = Personagens.PLAYER[DOWN]
-            self.direction = DOWN
-            self.camera[1] += 1
-        if pyxel.btn(pyxel.KEY_UP) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_UP):
-            self.player.y = (self.player.y - 1)
-            self.player.sprite = Personagens.PLAYER[UP]
-            self.direction = UP
-            self.camera[1] -= 1
-        if pyxel.btnp(pyxel.KEY_A) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_A):
-            self.entities += a_button(self)
-        if pyxel.btnp(pyxel.KEY_SPACE) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_X):
-=======
         if pyxel.btn(pyxel.KEY_RIGHT) or pyxel.btnv(pyxel.GAMEPAD1_AXIS_LEFTX) > self.deadzone:
             self.player.x += self.player.speed
             self.player.sprite = Personagens.PLAYER[LEFT]
@@ -303,7 +268,6 @@ class GameScreen:
         if pyxel.btnp(pyxel.KEY_A) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_A):
             self.entities += a_button(self)
         if pyxel.btnp(pyxel.KEY_SPACE) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_B):
->>>>>>> 63c15ed444b4c39c44d9cc8e925f7d5cda217eb6
             self.entities += space_button(self)
 
     def update(self):
