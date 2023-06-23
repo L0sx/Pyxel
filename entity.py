@@ -107,7 +107,7 @@ class Player:
     x: int
     y: int
     sprite: SPRITE_TYPE
-    speed: int = 0
+    speed: int = 1
     atk: int = 1
     strength: int = 0
     dexterity: int = 0
