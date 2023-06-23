@@ -26,20 +26,19 @@ class TitleScreen:
             CreditsScreen,
         ]
         self.current_option = 0
-        self.deadzone = 2000
 
     def controller(self):
         if pyxel.btnp(pyxel.KEY_LEFT):
             pass
         if pyxel.btnp(pyxel.KEY_RIGHT):
             pass
-        if pyxel.btnp(pyxel.KEY_DOWN) or pyxel.btnv(pyxel.GAMEPAD1_AXIS_LEFTY) > self.deadzone:
+        if pyxel.btnp(pyxel.KEY_DOWN):
             self.current_option = (self.current_option +
                                    1) % len(self.menu_options)
-        if pyxel.btnp(pyxel.KEY_UP) or pyxel.btnv(pyxel.GAMEPAD1_AXIS_LEFTY) < -self.deadzone:
+        if pyxel.btnp(pyxel.KEY_UP):
             self.current_option = (self.current_option -
                                    1) % len(self.menu_options)
-        if pyxel.btnp(pyxel.KEY_RETURN) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_START):
+        if pyxel.btnp(pyxel.KEY_RETURN):
             match self.current_option:
                 case 0:
                     self.app.switch_screen(GameScreen)
@@ -159,7 +158,6 @@ class GameScreen:
         self.level = level
         self.last_spawn = 0
         self.portal = False
-        self.deadzone = 2000
 
         map_entities = map_seed()
         self.entities += map_entities
@@ -243,26 +241,39 @@ class GameScreen:
                 self.start(self.player, self.level+1)
 
     def controller(self):
-        if pyxel.btn(pyxel.KEY_RIGHT) or pyxel.btnv(pyxel.GAMEPAD1_AXIS_LEFTX) > self.deadzone:
-            self.player.x += self.player.speed
+        for at in dir(pyxel):
+            if "GAMEPAD" in at:
+                attr = getattr(pyxel, at)
+                bo = pyxel.btn(attr)
+                if bo:
+                    print(attr, at, bo)
+
+        print(pyxel.GAMEPAD1_BUTTON_A, pyxel.GAMEPAD1_BUTTON_DPAD_LEFT)
+        print(pyxel.btnv(pyxel.GAMEPAD2_AXIS_LEFTX),
+              pyxel.btnv(pyxel.GAMEPAD1_AXIS_LEFTY))
+        if pyxel.btn(pyxel.KEY_LEFT) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_LEFT):
+            self.player.x = (self.player.x - 1)
             self.player.sprite = Personagens.PLAYER[LEFT]
             self.direction = LEFT
-        elif pyxel.btn(pyxel.KEY_LEFT) or pyxel.btnv(pyxel.GAMEPAD1_AXIS_LEFTX) < -self.deadzone:
-            self.player.x -= self.player.speed
+            self.camera[0] -= 1
+        if pyxel.btn(pyxel.KEY_RIGHT) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_RIGHT):
+            self.player.x = (self.player.x + 1)
             self.player.sprite = Personagens.PLAYER[RIGHT]
             self.direction = RIGHT
-        
-        if pyxel.btn(pyxel.KEY_DOWN) or pyxel.btnv(pyxel.GAMEPAD1_AXIS_LEFTY) > self.deadzone:
-            self.player.y += self.player.speed
+            self.camera[0] += 1
+        if pyxel.btn(pyxel.KEY_DOWN) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_DOWN):
+            self.player.y = (self.player.y + 1)
             self.player.sprite = Personagens.PLAYER[DOWN]
             self.direction = DOWN
-        elif pyxel.btn(pyxel.KEY_UP) or pyxel.btnv(pyxel.GAMEPAD1_AXIS_LEFTY) < -self.deadzone:
-            self.player.y -= self.player.speed
+            self.camera[1] += 1
+        if pyxel.btn(pyxel.KEY_UP) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_UP):
+            self.player.y = (self.player.y - 1)
             self.player.sprite = Personagens.PLAYER[UP]
             self.direction = UP
+            self.camera[1] -= 1
         if pyxel.btnp(pyxel.KEY_A) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_A):
             self.entities += a_button(self)
-        if pyxel.btnp(pyxel.KEY_SPACE) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_B):
+        if pyxel.btnp(pyxel.KEY_SPACE) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_X):
             self.entities += space_button(self)
 
     def update(self):
