@@ -1,5 +1,5 @@
 import logging
-from typing import Sequence
+from typing import Callable, Sequence
 import pyxel
 
 from dataclasses import dataclass, field
@@ -107,6 +107,7 @@ class Player:
     x: int
     y: int
     sprite: SPRITE_TYPE
+    spritelist: Sequence[SPRITE_TYPE] | None = None
     speed: int = 1
     atk: int = 1
     strength: int = 0
@@ -121,6 +122,7 @@ class Player:
     exp_para_upar: int = 10
     exp_rate: int = 1
     exp_progresso: float = 3.14
+    skill_1: Callable = None
 
 
 @dataclass

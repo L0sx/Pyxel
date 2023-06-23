@@ -19,6 +19,8 @@ class App:
         log.debug("starting App")
         pyxel.init(160, 120)
         pyxel.load("assets/pyxel.pyxres")
+        
+        self.player = None
         self.screens = {
             TitleScreen: TitleScreen(self),
             GameScreen: GameScreen(self),
@@ -26,15 +28,15 @@ class App:
         }
         self.current_screen = self.screens[TitleScreen]
         self.game_screen = GameScreen(self)
+        
 
         pyxel.run(self.update, self.draw)
 
     def switch_screen(self, screen):
-        print(screen, self.screens.keys())
         self.current_screen = self.screens[screen]
 
     def update(self):
-        self.current_screen.update()
+         self.current_screen.update()
 
     def draw(self):
         self.current_screen.draw()

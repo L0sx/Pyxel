@@ -5,7 +5,7 @@ from map_gen import map_seed
 from entity import (Enemy, Player, Portal, Projectile, verifyCollision,
                     Item, levelUp, exp_walk, space_button, a_button)
 from sprites import LEFT, RIGHT, UP, DOWN
-from sprites import Inimigos, Personagens, Objetos, Efeitos
+from sprites import Inimigos, Personagens, Objetos, Efeitos, Colors
 from hud import PlayerHUD
 
 log = logging.getLogger(__name__)
@@ -27,12 +27,16 @@ class TitleScreen:
         ]
         self.current_option = 0
         self.deadzone = 2000
+        self.characters = [Player(0, 0, Personagens.WARRIOR[DOWN], Personagens.WARRIOR), 
+                            Player(0, 0, Personagens.ARCHER[DOWN], Personagens.ARCHER),
+                            Player(0, 0, Personagens.MAGE[DOWN], Personagens.MAGE)]
+        self.current_player = 0
 
     def controller(self):
         if pyxel.btnp(pyxel.KEY_LEFT):
-            pass
+            self.current_player = (self.current_player - 1) % len(self.characters)
         if pyxel.btnp(pyxel.KEY_RIGHT):
-            pass
+            self.current_player = (self.current_player + 1) % len(self.characters)
         if pyxel.btnp(pyxel.KEY_DOWN) or pyxel.btnv(pyxel.GAMEPAD1_AXIS_LEFTY) > self.deadzone:
             self.current_option = (self.current_option +
                                    1) % len(self.menu_options)
@@ -42,6 +46,7 @@ class TitleScreen:
         if pyxel.btnp(pyxel.KEY_RETURN) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_START):
             match self.current_option:
                 case 0:
+                    self.app.player = self.characters[self.current_player]
                     self.app.switch_screen(GameScreen)
                 case 1:
                     self.app.switch_screen(CreditsScreen)
@@ -77,8 +82,17 @@ class TitleScreen:
         for i, option in enumerate(self.menu_options):
             color = pyxel.frame_count % 15 if i == self.current_option else 9
             option = option.name
-            center_x_text(first30 + i*8, option, color, 12)
-
+            center_x_text(first30 + i*8+10, option, color, 12)
+        char1 = self.characters[self.current_player]
+        char2 = self.characters[(self.current_player + 1) % len(self.characters)]
+        char3 = self.characters[(self.current_player - 1) % len(self.characters)]
+        x = pyxel.width // 2 - char1.sprite[2] // 2
+        y = first30
+        pyxel.circ(x, y + char1.sprite[3] // 2, char1.sprite[3], Colors.BLACK)
+        pyxel.circb(x, y + char1.sprite[3] // 2, char1.sprite[3], pyxel.frame_count % 15)
+        pyxel.blt(x, y, *char1.sprite)
+        pyxel.blt(x + 20, y, *char2.sprite)
+        pyxel.blt(x - 20, y, *char3.sprite)
 
 class CreditsScreen:
     name = "Creditos"
@@ -143,11 +157,12 @@ class GameScreen:
         self.app = app
         self.start()
 
-    def start(self, player=None, level=1):
+    def start(self, level=1):
         log.info(f"iniciando level {level}")
-        if not player:
-            player = Player(pyxel.width // 2, pyxel.height //
-                            2, Personagens.PLAYER[DOWN])
+        player = self.app.player if self.app.player else Player(0, 0, Personagens.WARRIOR[DOWN], Personagens.WARRIOR)
+        player.x = pyxel.width // 2
+        player.y = pyxel.height // 2
+        print(player, self.app.player)
 
         self.player = player
         self.entities = []
@@ -245,7 +260,7 @@ class GameScreen:
 
         for entity_id, portal in self.filter_entities(Portal):
             if verifyCollision(portal, self.player):
-                self.start(self.player, self.level+1)
+                self.start(self.app.player, self.level+1)
 
     def controller(self):
         for at in dir(pyxel):
@@ -260,22 +275,22 @@ class GameScreen:
               pyxel.btnv(pyxel.GAMEPAD1_AXIS_LEFTY))
         if pyxel.btn(pyxel.KEY_LEFT) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_LEFT):
             self.player.x = (self.player.x - 1)
-            self.player.sprite = Personagens.PLAYER[LEFT]
+            self.player.sprite = self.player.spritelist[LEFT]
             self.direction = LEFT
             self.camera[0] -= 1
         if pyxel.btn(pyxel.KEY_RIGHT) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_RIGHT):
             self.player.x = (self.player.x + 1)
-            self.player.sprite = Personagens.PLAYER[RIGHT]
+            self.player.sprite = self.player.spritelist[RIGHT]
             self.direction = RIGHT
             self.camera[0] += 1
         if pyxel.btn(pyxel.KEY_DOWN) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_DOWN):
             self.player.y = (self.player.y + 1)
-            self.player.sprite = Personagens.PLAYER[DOWN]
+            self.player.sprite = self.player.spritelist[DOWN]
             self.direction = DOWN
             self.camera[1] += 1
         if pyxel.btn(pyxel.KEY_UP) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_UP):
             self.player.y = (self.player.y - 1)
-            self.player.sprite = Personagens.PLAYER[UP]
+            self.player.sprite = self.player.spritelist[UP]
             self.direction = UP
             self.camera[1] -= 1
         if pyxel.btnp(pyxel.KEY_A) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_A):
