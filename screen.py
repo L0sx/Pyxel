@@ -162,16 +162,15 @@ class GameScreen:
 
     def __init__(self, app):
         self.app = app
+        self.player = self.app.select_player
         self.start()
+        
 
     def start(self, level=1):
         log.info(f"iniciando level {level}")
-        player = self.app.player if self.app.player else Player(0, 0, Personagens.WARRIOR[DOWN], Personagens.WARRIOR)
-        player.x = pyxel.width // 2
-        player.y = pyxel.height // 2
-        print(player, self.app.player)
+        self.player.x = pyxel.width // 2
+        self.player.y = pyxel.height // 2
 
-        self.player = player
         self.entities = []
         self._trash = set()
         self.player_hud = PlayerHUD()
@@ -267,7 +266,7 @@ class GameScreen:
 
         for entity_id, portal in self.filter_entities(Portal):
             if verifyCollision(portal, self.player):
-                self.start(self.app.player, self.level+1)
+                self.start(self.app.select_player, self.level+1)
 
     def controller(self):
         for at in dir(pyxel):
