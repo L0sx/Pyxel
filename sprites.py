@@ -55,6 +55,20 @@ class Efeitos:
 
 
 class Personagens:
+    MAGE = (
+        (0, 16, 0, 8, 8, 7),
+        (0, 24, 0, 8, 8, 7)
+    )
+
+    WARRIOR = (
+        (0, 16, 8, 8, 8, 7),
+        (0, 24, 16, 8, 8, 7)
+    )
+
+    ARCHER = (
+        (0, 16, 16, 8, 8, 7),
+        (0, 24, 16, 8, 8, 7)
+    )
     PLAYER = {
         LEFT: (0, 0, 8, 8, 8, COLKEY),
         RIGHT: (0, 8, 8, 8, 8, COLKEY),
