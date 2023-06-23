@@ -26,19 +26,20 @@ class TitleScreen:
             CreditsScreen,
         ]
         self.current_option = 0
+        self.deadzone = 2000
 
     def controller(self):
         if pyxel.btnp(pyxel.KEY_LEFT):
             pass
         if pyxel.btnp(pyxel.KEY_RIGHT):
             pass
-        if pyxel.btnp(pyxel.KEY_DOWN):
+        if pyxel.btnp(pyxel.KEY_DOWN) or pyxel.btnv(pyxel.GAMEPAD1_AXIS_LEFTY) > self.deadzone:
             self.current_option = (self.current_option +
                                    1) % len(self.menu_options)
-        if pyxel.btnp(pyxel.KEY_UP):
+        if pyxel.btnp(pyxel.KEY_UP) or pyxel.btnv(pyxel.GAMEPAD1_AXIS_LEFTY) < -self.deadzone:
             self.current_option = (self.current_option -
                                    1) % len(self.menu_options)
-        if pyxel.btnp(pyxel.KEY_RETURN):
+        if pyxel.btnp(pyxel.KEY_RETURN) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_START):
             match self.current_option:
                 case 0:
                     self.app.switch_screen(GameScreen)
@@ -145,7 +146,8 @@ class GameScreen:
     def start(self, player=None, level=1):
         log.info(f"iniciando level {level}")
         if not player:
-            player = Player(80, 60, Personagens.PLAYER[DOWN])
+            player = Player(pyxel.width // 2, pyxel.height //
+                            2, Personagens.PLAYER[DOWN])
 
         self.player = player
         self.entities = []
@@ -158,11 +160,14 @@ class GameScreen:
         self.level = level
         self.last_spawn = 0
         self.portal = False
+        self.deadzone = 2000
 
         map_entities = map_seed()
         self.entities += map_entities
         boss = Enemy(0, 0, Inimigos.BOSS[0], Inimigos.BOSS, vida=level*10)
         self.entities.append(boss)
+
+        self.camera = [0, 0]
 
     def spawn(self):
         enemy_count = len([enemy for enemy in self.filter_entities(Enemy)])
@@ -206,10 +211,12 @@ class GameScreen:
                 if self.player.x < enemy.x:
                     self.player.vida -= 1
                     self.player.x -= 5
+                    self.camera[0] -= 5
                     enemy.x += 5
                 else:
                     self.player.vida -= 1
                     self.player.x += 5
+                    self.camera[0] += 5
                     enemy.x -= 5
             for project_id, projectile in self.filter_entities(Projectile):
                 if verifyCollision(enemy, projectile):
@@ -292,6 +299,7 @@ class GameScreen:
             log.debug(f"entidade: {entity_id} foi deletado")
 
     def draw(self):
+        pyxel.camera(*self.camera)
         pyxel.cls(self.bg_color)
         pyxel.blt(self.player.x, self.player.y, *self.player.sprite)
 
