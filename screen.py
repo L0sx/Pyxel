@@ -254,6 +254,8 @@ class GameScreen:
                     print(attr, at, bo)
 
         print(pyxel.GAMEPAD1_BUTTON_A, pyxel.GAMEPAD1_BUTTON_DPAD_LEFT)
+        print(pyxel.btnv(pyxel.GAMEPAD2_AXIS_LEFTX),
+              pyxel.btnv(pyxel.GAMEPAD1_AXIS_LEFTY))
         if pyxel.btn(pyxel.KEY_LEFT) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_LEFT):
             self.player.x = (self.player.x - 1)
             self.player.sprite = Personagens.PLAYER[LEFT]

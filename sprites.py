@@ -7,6 +7,17 @@ SPRITE_TYPE = Tuple[int, int, int, int, int, int] | Sequence[int]
 COLKEY = 7
 
 
+class Ground:
+    GRASS1 = 1, 32, 64, 8, 8, COLKEY
+    GRASS2 = 1, 40, 64, 8, 8, COLKEY
+    GRASS3 = 1, 32, 72, 8, 8, COLKEY
+    GRASS4 = 1, 40, 72, 8, 8, COLKEY
+    WATER1 = 1, 32, 32, 8, 8, COLKEY
+    WATER2 = 1, 40, 32, 8, 8, COLKEY
+    WATER3 = 1, 32, 40, 8, 8, COLKEY
+    WATER4 = 1, 40, 40, 8, 8, COLKEY
+
+
 class Colors:
     BLACK = 0
     BLUE1 = 1
