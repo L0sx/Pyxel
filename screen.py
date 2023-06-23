@@ -46,8 +46,9 @@ class TitleScreen:
         if pyxel.btnp(pyxel.KEY_RETURN) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_START):
             match self.current_option:
                 case 0:
-                    self.app.player = self.characters[self.current_player]
+                    self.app.select_player = self.characters[self.current_player]
                     self.app.switch_screen(GameScreen)
+                    print("player do screen", self.app.select_player)
                 case 1:
                     self.app.switch_screen(CreditsScreen)
             # self.app.switch_screen(self.menu_options[self.current_option])
@@ -83,13 +84,19 @@ class TitleScreen:
             color = pyxel.frame_count % 15 if i == self.current_option else 9
             option = option.name
             center_x_text(first30 + i*8+10, option, color, 12)
-        char1 = self.characters[self.current_player]
-        char2 = self.characters[(self.current_player + 1) % len(self.characters)]
-        char3 = self.characters[(self.current_player - 1) % len(self.characters)]
-        x = pyxel.width // 2 - char1.sprite[2] // 2
-        y = first30
-        pyxel.circ(x, y + char1.sprite[3] // 2, char1.sprite[3], Colors.BLACK)
-        pyxel.circb(x, y + char1.sprite[3] // 2, char1.sprite[3], pyxel.frame_count % 15)
+        char1 = self.characters[0]
+        char2 = self.characters[1]
+        char3 = self.characters[2]
+        x = 76
+        y = 30
+        pyxel.rect(30, 20, 100, 30, Colors.BEGE)
+        pyxel.rectb(30, 20, 100, 30, Colors.MARROM)
+        pyxel.circ(x + 3, y + char1.sprite[3] // 2, char1.sprite[3], Colors.BLACK)
+        pyxel.circb(x + 3, y + char1.sprite[3] // 2, char1.sprite[3], pyxel.frame_count % 15 if self.current_player == 0 else 11)
+        pyxel.circ(x + 23, y + char2.sprite[3] // 2, char2.sprite[3], Colors.BLACK)
+        pyxel.circb(x + 23, y + char2.sprite[3] // 2, char2.sprite[3], pyxel.frame_count % 15 if self.current_player == 1 else 11)
+        pyxel.circ(x - 17, y + char3.sprite[3] // 2, char3.sprite[3], Colors.BLACK)
+        pyxel.circb(x - 17, y + char3.sprite[3] // 2, char3.sprite[3], pyxel.frame_count % 15 if self.current_player == 2 else 11)
         pyxel.blt(x, y, *char1.sprite)
         pyxel.blt(x + 20, y, *char2.sprite)
         pyxel.blt(x - 20, y, *char3.sprite)
