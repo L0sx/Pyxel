@@ -40,7 +40,7 @@ class App:
 
     def update(self):
          self.current_screen.update()
-
+ 
     def draw(self):
         self.current_screen.draw()
 

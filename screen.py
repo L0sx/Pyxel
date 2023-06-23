@@ -168,6 +168,7 @@ class GameScreen:
 
     def start(self, level=1):
         log.info(f"iniciando level {level}")
+        self.player = self.player
         self.player.x = pyxel.width // 2
         self.player.y = pyxel.height // 2
 
@@ -266,7 +267,7 @@ class GameScreen:
 
         for entity_id, portal in self.filter_entities(Portal):
             if verifyCollision(portal, self.player):
-                self.start(self.app.select_player, self.level+1)
+                self.start(self.level+1)
 
     def controller(self):
         for at in dir(pyxel):
