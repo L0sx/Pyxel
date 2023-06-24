@@ -19,23 +19,28 @@ class App:
         log.debug("starting App")
         pyxel.init(160, 120)
         pyxel.load("assets/pyxel.pyxres")
+        
+        self.select_player = None
         self.screens = {
             TitleScreen: TitleScreen(self),
-            GameScreen: GameScreen(self),
-            CreditsScreen: CreditsScreen(self),
+            GameScreen: None,
+            CreditsScreen: None,
         }
         self.current_screen = self.screens[TitleScreen]
-        self.game_screen = GameScreen(self)
+        
 
         pyxel.run(self.update, self.draw)
 
     def switch_screen(self, screen):
-        print(screen, self.screens.keys())
+        if screen == GameScreen and self.screens[GameScreen] is None:
+            self.screens[GameScreen] = GameScreen(self)
+        elif screen == CreditsScreen and self.screens[CreditsScreen] is None:
+            self.screens[CreditsScreen] = CreditsScreen(self)
         self.current_screen = self.screens[screen]
 
     def update(self):
-        self.current_screen.update()
-
+         self.current_screen.update()
+ 
     def draw(self):
         self.current_screen.draw()
 
