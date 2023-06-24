@@ -21,40 +21,41 @@ def center_x_text(y, text, colkey=9, bg=None):
 class TitleScreen:
     def __init__(self, app):
         self.app = app
-        self.menu_options = [
-            GameScreen,
-            CreditsScreen,
-        ]
         self.current_option = 0
         self.deadzone = 2000
         self.characters = [Player(0, 0, Personagens.WARRIOR[DOWN], Personagens.WARRIOR), 
                             Player(0, 0, Personagens.ARCHER[DOWN], Personagens.ARCHER),
-                            Player(0, 0, Personagens.MAGE[DOWN], Personagens.MAGE)]
+                            Player(0, 0, Personagens.MAGE[DOWN], Personagens.MAGE),
+                            CreditsScreen]
         self.current_player = 0
 
     def controller(self):
         if pyxel.btnp(pyxel.KEY_LEFT):
-            self.current_player = (self.current_player - 1) % len(self.characters)
+            self.current_player = (self.current_player - 1) % 3
         if pyxel.btnp(pyxel.KEY_RIGHT):
-            self.current_player = (self.current_player + 1) % len(self.characters)
+            self.current_player = (self.current_player + 1) % 3
         if pyxel.btnp(pyxel.KEY_DOWN) or pyxel.btnv(pyxel.GAMEPAD1_AXIS_LEFTY) > self.deadzone:
-            self.current_option = (self.current_option +
-                                   1) % len(self.menu_options)
+            self.current_player = 3
         if pyxel.btnp(pyxel.KEY_UP) or pyxel.btnv(pyxel.GAMEPAD1_AXIS_LEFTY) < -self.deadzone:
-            self.current_option = (self.current_option -
-                                   1) % len(self.menu_options)
+            self.current_player = 0
         if pyxel.btnp(pyxel.KEY_RETURN) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_START):
-            match self.current_option:
+            match self.current_player:
                 case 0:
                     self.app.select_player = self.characters[self.current_player]
                     self.app.switch_screen(GameScreen)
-                    print("player do screen", self.app.select_player)
                 case 1:
+                    self.app.select_player = self.characters[self.current_player]
+                    self.app.switch_screen(GameScreen)
+                case 2:
+                    self.app.select_player = self.characters[self.current_player]
+                    self.app.switch_screen(GameScreen)
+                case 3:
                     self.app.switch_screen(CreditsScreen)
             # self.app.switch_screen(self.menu_options[self.current_option])
 
     def update(self):
         self.controller()
+        print(self.current_player)
 
     def draw(self):
         pyxel.cls(1)
@@ -80,23 +81,21 @@ class TitleScreen:
         first30 = pyxel.height * 0.3
         center_x_text(first30 / 2, "TITULO DO JOGO", 9, 13)
 
-        for i, option in enumerate(self.menu_options):
-            color = pyxel.frame_count % 15 if i == self.current_option else 9
-            option = option.name
-            center_x_text(first30 + i*8+10, option, color, 12)
+        
+        color = pyxel.frame_count % 15
+        option = self.characters[3].name
+        center_x_text(first30 + 30, option, color if self.current_player == 3 else 0, 12)
         char1 = self.characters[0]
         char2 = self.characters[1]
         char3 = self.characters[2]
         x = 76
-        y = 30
-        pyxel.rect(30, 20, 100, 30, Colors.BEGE)
-        pyxel.rectb(30, 20, 100, 30, Colors.MARROM)
-        pyxel.circ(x + 3, y + char1.sprite[3] // 2, char1.sprite[3], Colors.BLACK)
-        pyxel.circb(x + 3, y + char1.sprite[3] // 2, char1.sprite[3], pyxel.frame_count % 15 if self.current_player == 0 else 11)
-        pyxel.circ(x + 23, y + char2.sprite[3] // 2, char2.sprite[3], Colors.BLACK)
-        pyxel.circb(x + 23, y + char2.sprite[3] // 2, char2.sprite[3], pyxel.frame_count % 15 if self.current_player == 1 else 11)
-        pyxel.circ(x - 17, y + char3.sprite[3] // 2, char3.sprite[3], Colors.BLACK)
-        pyxel.circb(x - 17, y + char3.sprite[3] // 2, char3.sprite[3], pyxel.frame_count % 15 if self.current_player == 2 else 11)
+        y = 50
+        pyxel.circ(x + 3, y + char2.sprite[3] // 2, char2.sprite[3], Colors.BLACK)
+        pyxel.circb(x + 3, y + char2.sprite[3] // 2, char2.sprite[3], pyxel.frame_count % 15 if self.current_player == 0 else 11)
+        pyxel.circ(x + 23, y + char3.sprite[3] // 2, char3.sprite[3], Colors.BLACK)
+        pyxel.circb(x + 23, y + char3.sprite[3] // 2, char3.sprite[3], pyxel.frame_count % 15 if self.current_player == 1 else 11)
+        pyxel.circ(x - 17, y + char1.sprite[3] // 2, char1.sprite[3], Colors.BLACK)
+        pyxel.circb(x - 17, y + char1.sprite[3] // 2, char1.sprite[3], pyxel.frame_count % 15 if self.current_player == 2 else 11)
         pyxel.blt(x, y, *char1.sprite)
         pyxel.blt(x + 20, y, *char2.sprite)
         pyxel.blt(x - 20, y, *char3.sprite)
@@ -234,11 +233,13 @@ class GameScreen:
                     self.player.vida -= 1
                     self.player.x -= 5
                     self.camera[0] -= 5
+                    self.player_hud.height -= 5
                     enemy.x += 5
                 else:
                     self.player.vida -= 1
                     self.player.x += 5
                     self.camera[0] += 5
+                    self.player_hud.height += 5
                     enemy.x -= 5
             for project_id, projectile in self.filter_entities(Projectile):
                 if verifyCollision(enemy, projectile):
@@ -337,4 +338,4 @@ class GameScreen:
         vida_texto = "points: {}".format(self.points)
         pyxel.text(10, 10, vida_texto, 7)
 
-        self.player_hud.drawn(self.player)
+        self.player_hud.drawn(self.player, self.camera)
