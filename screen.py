@@ -3,7 +3,7 @@ import pyxel
 from typing import Callable, Generator, Tuple
 from map_gen import map_seed
 from entity import (Enemy, Player, Portal, Projectile, verifyCollision,
-                    Item, levelUp, exp_walk, space_button, a_button)
+                    Item, levelUp, exp_walk, space_button, a_button, ciclone, arrow)
 from sprites import LEFT, RIGHT, UP, DOWN
 from sprites import Inimigos, Personagens, Objetos, Efeitos, Colors
 from hud import PlayerHUD
@@ -23,9 +23,9 @@ class TitleScreen:
         self.app = app
         self.current_option = 0
         self.deadzone = 2000
-        self.characters = [Player(0, 0, Personagens.WARRIOR[DOWN], Personagens.WARRIOR), 
-                            Player(0, 0, Personagens.ARCHER[DOWN], Personagens.ARCHER),
-                            Player(0, 0, Personagens.MAGE[DOWN], Personagens.MAGE),
+        self.characters = [Player(0, 0, Personagens.WARRIOR[DOWN], Personagens.WARRIOR, skill_1=ciclone), 
+                            Player(0, 0, Personagens.ARCHER[DOWN], Personagens.ARCHER, skill_1=arrow),
+                            Player(0, 0, Personagens.MAGE[DOWN], Personagens.MAGE, skill_1=a_button),
                             CreditsScreen]
         self.current_player = 0
 
@@ -55,7 +55,6 @@ class TitleScreen:
 
     def update(self):
         self.controller()
-        print(self.current_player)
 
     def draw(self):
         pyxel.cls(1)
@@ -163,6 +162,7 @@ class GameScreen:
         self.app = app
         self.player = self.app.select_player
         self.start()
+        self.t = 0
         
 
     def start(self, level=1):
@@ -278,35 +278,37 @@ class GameScreen:
                 if bo:
                     print(attr, at, bo)
 
-        print(pyxel.GAMEPAD1_BUTTON_A, pyxel.GAMEPAD1_BUTTON_DPAD_LEFT)
-        print(pyxel.btnv(pyxel.GAMEPAD2_AXIS_LEFTX),
-              pyxel.btnv(pyxel.GAMEPAD1_AXIS_LEFTY))
+        #print(pyxel.GAMEPAD1_BUTTON_A, pyxel.GAMEPAD1_BUTTON_DPAD_LEFT)
+        #print(pyxel.btnv(pyxel.GAMEPAD2_AXIS_LEFTX),
+        #      pyxel.btnv(pyxel.GAMEPAD1_AXIS_LEFTY))
         if pyxel.btn(pyxel.KEY_LEFT) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_LEFT):
             self.player.x = (self.player.x - 1)
             self.player.sprite = self.player.spritelist[LEFT]
-            self.direction = LEFT
+            self.player.direct = LEFT
             self.camera[0] -= 1
         if pyxel.btn(pyxel.KEY_RIGHT) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_RIGHT):
             self.player.x = (self.player.x + 1)
             self.player.sprite = self.player.spritelist[RIGHT]
-            self.direction = RIGHT
+            self.player.direct = RIGHT
             self.camera[0] += 1
         if pyxel.btn(pyxel.KEY_DOWN) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_DOWN):
             self.player.y = (self.player.y + 1)
             self.player.sprite = self.player.spritelist[DOWN]
-            self.direction = DOWN
+            self.player.direct = DOWN
             self.camera[1] += 1
         if pyxel.btn(pyxel.KEY_UP) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_UP):
             self.player.y = (self.player.y - 1)
             self.player.sprite = self.player.spritelist[UP]
-            self.direction = UP
+            self.player.direct = UP
             self.camera[1] -= 1
         if pyxel.btnp(pyxel.KEY_A) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_A):
-            self.entities += a_button(self)
+            self.entities += self.player.skill_1(self)
         if pyxel.btnp(pyxel.KEY_SPACE) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_X):
             self.entities += space_button(self)
 
     def update(self):
+        self.t += 1
+        print (self.t % 6)
         self.controller()
         self.entities_collision()
         self.spawn()
@@ -327,7 +329,7 @@ class GameScreen:
         pyxel.blt(self.player.x, self.player.y, *self.player.sprite)
 
         for entity in self.entities:
-            if hasattr(entity, 'sprite_list'):
+            if hasattr(entity, 'sprite_list') and entity.sprite_list != None:
                 frames_per_sprite = 3
                 sprite_frame = pyxel.frame_count % len(
                     entity.sprite_list) * frames_per_sprite
