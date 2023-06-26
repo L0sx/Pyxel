@@ -39,13 +39,13 @@ class Colors:
 
 class Sides(Enum):
     LEFT = -1, 0
-    RIGHT = 1, 0
-    UP = 0, -1
-    DOWN = 0, 1
-    UP_LEFT = -1, -1
-    UP_RIGHT = 1, -1
     DOWN_LEFT = -1, 1
+    DOWN = 0, 1
     DOWN_RIGHT = 1, 1
+    RIGHT = 1, 0
+    UP_RIGHT = 1, -1
+    UP = 0, -1
+    UP_LEFT = -1, -1
 
 
 LEFT = Sides.LEFT
@@ -75,6 +75,28 @@ class Efeitos:
         (2, 8, 0, 8, 8, 0),
         (2, 0, 8, 8, 8, 0),
         (2, 8, 8, 8, 8, 0),
+    )
+    CYCLONE = (
+        (2, 0, 40, 8, 8, Colors.BLACK),
+        (2, 0, 48, 8, 8, Colors.BLACK),
+        (2, 8, 32, 8, -8, Colors.BLACK),
+        (2, 0, 48, -8, 8, Colors.BLACK),
+        (2, 0, 40, -8, 8, Colors.BLACK),
+        (2, 0, 32, -8, 8, Colors.BLACK),
+        (2, 8, 32, 8, 8, Colors.BLACK),
+        (2, 0, 32, 8, 8, Colors.BLACK),
+    )
+    ARROW = (
+        (2, 0, 24, 8, 5, Colors.WHITE),
+        (2, 0, 24, -8, 5, Colors.WHITE),
+        (2, 0, 16, 5, -8, Colors.WHITE),
+        (2, 0, 16, 5, 8, Colors.WHITE),
+    )
+    FIREBALL = (
+        (2, 8, 24, 8, 5, Colors.WHITE),
+        (2, 8, 24, -8, 5, Colors.WHITE),
+        (2, 8, 16, 5, -8, Colors.WHITE),
+        (2, 8, 16, 5, 8, Colors.WHITE),
     )
     EXP_ORB = (
         (2, 16, 16, 8, 8, 15),

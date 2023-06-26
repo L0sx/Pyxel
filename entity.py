@@ -10,10 +10,58 @@ from sprites import Efeitos
 
 log = logging.getLogger(__name__)
 
+def ciclone(self):
+        return_list = []
+        directions = Sides
+        damage = self.player.atk
+
+        for i, direction in enumerate(directions):
+            dx, dy = direction.value
+            distance = 8
+            index = i
+
+            new_speedx = dx * distance
+            new_speedy = dy * distance
+
+            new_x = self.player.x + new_speedx
+            new_y = self.player.y + new_speedy
+
+            attack = Projectile(
+                new_x, new_y, Efeitos.CYCLONE[index], duration=1.1 ,damage=damage)
+            print(attack)
+            return_list.append(attack)
+        return return_list
+
+def arrow(self):
+        return_list = []
+        speedx, speedy = self.player.direct.value
+
+        multi = 8
+        new_speedx = speedx * multi
+        new_speedy = speedy * multi
+
+        new_x = self.player.x + new_speedx
+        new_y = self.player.y + new_speedy
+
+        damage = self.player.atk
+        if self.player.direct == Sides.LEFT:
+            attack = Projectile(
+                new_x, new_y, Efeitos.ARROW[0], speedx=speedx, speedy=speedy, damage=damage)
+        elif self.player.direct == Sides.RIGHT:
+            attack = Projectile(
+                new_x, new_y, Efeitos.ARROW[1], speedx=speedx, speedy=speedy, damage=damage)
+        elif self.player.direct == Sides.UP:
+            attack = Projectile(
+                new_x, new_y, Efeitos.ARROW[3], speedx=speedx, speedy=speedy, damage=damage)
+        elif self.player.direct == Sides.DOWN:
+            attack = Projectile(
+                new_x, new_y, Efeitos.ARROW[2], speedx=speedx, speedy=speedy, damage=damage)
+        return_list.append(attack)
+        return return_list
 
 def a_button(self):
     return_list = []
-    speedx, speedy = self.direction.value
+    speedx, speedy = self.player.direct.value
 
     multi = 8
     new_speedx = speedx * multi
@@ -24,8 +72,19 @@ def a_button(self):
 
     damage = self.player.atk
 
-    attack = Projectile(
-        new_x, new_y, Efeitos.ATTACK[0], Efeitos.ATTACK, speedx, speedy, damage=damage)
+    if self.player.direct == Sides.LEFT:
+        attack = Projectile(
+            new_x, new_y, Efeitos.FIREBALL[0], speedx=speedx, speedy=speedy, damage=damage)
+    elif self.player.direct == Sides.RIGHT:
+        attack = Projectile(
+            new_x, new_y, Efeitos.FIREBALL[1], speedx=speedx, speedy=speedy, damage=damage)
+    elif self.player.direct == Sides.UP:
+        attack = Projectile(
+            new_x, new_y, Efeitos.FIREBALL[3], speedx=speedx, speedy=speedy, damage=damage)
+    elif self.player.direct == Sides.DOWN:
+        attack = Projectile(
+            new_x, new_y, Efeitos.FIREBALL[2], speedx=speedx, speedy=speedy, damage=damage)
+    print("attack: ", attack)
     return_list.append(attack)
     return return_list
 
