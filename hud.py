@@ -1,26 +1,37 @@
 import pyxel
-
+from sprites import Hud
+from entity import Object
 
 class PlayerHUD:
     def __init__(self) -> None:
-        self.height = 10
+        self.listExp = []
+        
+    def criar_primeira_barra(self):
+        self.listExp.append(Object(0, 118, Hud.exp_start, "exp_start"))
+        
+    def criar_barra_exp(self, x):
+        zx = x + 2
+        self.listExp.append(Object(zx, 118, Hud.exp_middle, "exp_middle"))
+        
+    def excluir_todas_barras(self):
+        self.listExp.clear()
 
-    def drawn(self, player, camera):
-        start_h = pyxel.height - self.height
-        half_height = self.height/2
+        
+        
+    def displayHud(self, player):
+        
+        exp_atual = player.exp_atual
+        expToDisplay = int(player.exp_para_upar / 60)
+        
+        if exp_atual == 0:
+            return
+        else:
+            print(expToDisplay % exp_atual)
+        
+        
+    def update(self, player):
+        self.displayHud(player)
 
-        pyxel.tri(camera[0], start_h-10, 0 + camera[1], pyxel.height,
-                  self.height+10, pyxel.height, 13)
-        pyxel.circ(half_height + camera[0], start_h + camera[1]+ half_height, half_height, 8)
-        pyxel.rect(camera[0], start_h + camera[1], self.height+1, (10-player.vida) % 10, 13)
-
-        pyxel.text(self.height, start_h, f"{player.vida}", 7)
-
-        pyxel.circ(pyxel.width-half_height + camera[0], start_h +
-                   half_height + 3 + camera[1], half_height, 6)
-
-        for i, item in enumerate(player.inventory):
-            x = 20 + i * 11
-            y = start_h
-            pyxel.rect(x-1, y-1, 10, 10, 13)
-            pyxel.blt(x, y, *item.sprite)
+    def drawn(self):
+        for barra in self.listExp:
+            pyxel.blt(barra.x, barra.y, *barra.sprite)

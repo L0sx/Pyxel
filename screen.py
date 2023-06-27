@@ -232,14 +232,10 @@ class GameScreen:
                 if self.player.x < enemy.x:
                     self.player.vida -= 1
                     self.player.x -= 5
-                    self.camera[0] -= 5
-                    self.player_hud.height -= 5
                     enemy.x += 5
                 else:
                     self.player.vida -= 1
                     self.player.x += 5
-                    self.camera[0] += 5
-                    self.player_hud.height += 5
                     enemy.x -= 5
             for project_id, projectile in self.filter_entities(Projectile):
                 if verifyCollision(enemy, projectile):
@@ -270,6 +266,10 @@ class GameScreen:
             if verifyCollision(portal, self.player):
                 self.start(self.level+1)
 
+    def updateCamera (self):
+        self.camera[0] = self.player.x - pyxel.width // 2
+        self.camera[1] = self.player.y - pyxel.height // 2
+
     def controller(self):
         for at in dir(pyxel):
             if "GAMEPAD" in at:
@@ -285,33 +285,30 @@ class GameScreen:
             self.player.x = (self.player.x - 1)
             self.player.sprite = self.player.spritelist[LEFT]
             self.player.direct = LEFT
-            self.camera[0] -= 1
         if pyxel.btn(pyxel.KEY_RIGHT) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_RIGHT):
             self.player.x = (self.player.x + 1)
             self.player.sprite = self.player.spritelist[RIGHT]
             self.player.direct = RIGHT
-            self.camera[0] += 1
         if pyxel.btn(pyxel.KEY_DOWN) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_DOWN):
             self.player.y = (self.player.y + 1)
             self.player.sprite = self.player.spritelist[DOWN]
             self.player.direct = DOWN
-            self.camera[1] += 1
         if pyxel.btn(pyxel.KEY_UP) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_UP):
             self.player.y = (self.player.y - 1)
             self.player.sprite = self.player.spritelist[UP]
             self.player.direct = UP
-            self.camera[1] -= 1
         if pyxel.btnp(pyxel.KEY_A) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_A):
             self.entities += self.player.skill_1(self)
         if pyxel.btnp(pyxel.KEY_SPACE) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_X):
             self.entities += space_button(self)
 
     def update(self):
+        self.updateCamera()
         self.t += 1
-        print (self.t % 6)
         self.controller()
         self.entities_collision()
         self.spawn()
+        self.player_hud.update(self.player)
 
         if self.player.vida <= 0:
             self.start()
@@ -340,4 +337,4 @@ class GameScreen:
         vida_texto = "points: {}".format(self.points)
         pyxel.text(10, 10, vida_texto, 7)
 
-        self.player_hud.drawn(self.player, self.camera)
+        self.player_hud.drawn()

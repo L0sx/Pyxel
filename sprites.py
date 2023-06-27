@@ -155,3 +155,9 @@ class Objetos:
 
 class Items:
     blade = 2, 40, 0, 8, 8, 15
+    
+class Hud:
+    vida = 2, 40, 16, 8, 8, Colors.WHITE,
+    exp_start = 2, 32, 24, 8, 8, Colors.WHITE,
+    exp_middle = 2, 32, 16, 8, 8, Colors.WHITE,
+    exp_end = 2, 32, 24, -8, 8, Colors.WHITE

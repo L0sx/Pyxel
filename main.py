@@ -3,7 +3,7 @@ import pyxel
 from screen import CreditsScreen, TitleScreen, GameScreen
 
 
-str_format = '%(asctime)s:%(name)s:%(levelname)s:%(message)s'
+str_format = '%(asctime)s:%(name)s:%(levelname)s:%(message)s'  
 formatter = logging.Formatter(str_format)
 logging.basicConfig(filename='game.log',
                     encoding='utf-8', level=logging.DEBUG, format=str_format)
