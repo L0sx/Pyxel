@@ -46,18 +46,18 @@ class Game:
 
     def start(self):
         self.entities: Dict[type, list] = {}
-        self.add_entity(
+        self.add(
             Player(x=50, y=50, states=MAGE, current_state=DOWN),
             Enemy(speed=1, angle=45, states=ENEMIE1, current_state=DOWN)
         )
 
-    def add_entity(self, *entities):
+    def add(self, *entities):
         for entity in entities:
             if not self.entities.get(type(entity)):
                 self.entities[type(entity)] = []
             self.entities[type(entity)].append(entity)
 
-    def remove_entity(self, *entities):
+    def remove(self, *entities):
         for entity in entities:
             if entity in self.entities[type(entity)]:
                 self.entities[type(entity)].remove(entity)
@@ -75,17 +75,15 @@ class Game:
         if pyxel.btn(pyxel.KEY_UP):
             player.y -= 1
         if pyxel.btnp(pyxel.KEY_SPACE):
-            self.add_entity(
-                Projectile(x=player.x, y=player.y, angle=-
-                           90, speed=3, origin=type(player),
-                           sprite=FIREBALL)
-            )
+            player.skill_1(self.add)
+        if pyxel.btnp(pyxel.KEY_A):
+            player.skill_2(self.add)
 
     def update(self):
         self.controller()
 
         if len(self.entities[Enemy]) <= 10:
-            self.add_entity(
+            self.add(
                 Enemy(
                     states=ENEMIE1,
                     current_state=DOWN,
@@ -101,18 +99,16 @@ class Game:
 
                 match entity:
                     case Projectile():
-                        for other in self.entities[Enemy]:
-                            if entity.collide_with_target(other):
-                                self.remove_entity(entity)
-                                other.hp -= 1
-                                if other.hp <= 0:
-                                    pyxel.play(0, 0)
-                                    self.remove_entity(other)
-                        for other in self.entities[Player]:
-                            if entity.collide_with_target(other):
-                                self.remove_entity(entity)
-                                if other.hp <= 0:
-                                    self.remove_entity(other)
+                        for enemy in self.entities[Enemy]:
+                            if entity.collide_with_target(enemy):
+                                self.remove(entity)
+                                entity.attack(
+                                    enemy, kill_func=self.remove)
+                                self.remove(entity)
+                        for player in self.entities[Player]:
+                            if entity.collide_with_target(player):
+                                entity.attack(player)
+                                self.remove(entity)
                     case Enemy():
                         entity.angle += 5
 
