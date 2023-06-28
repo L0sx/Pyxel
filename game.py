@@ -43,11 +43,25 @@ class HUD:
     player: Player
 
     def render(self):
+        xlife = self.player.x - 2
+        ylife = self.player.y - 4
+        life_total = xlife + 10
+        tamanhoLife = self.player.w + 2
+        life = 10
+        exp = 99
+        exp_atual = exp if exp else 1
+        exp_total = 100
+        percenteExp = (exp_atual / exp_total)
+        percenteLife = (life / life_total)
+        tamanhoBarra = pyxel.width - 20
+        
         pyxel.circ(10, 10, self.player.w, 7)
         pyxel.circb(10, 10, self.player.w, 10)
 
-        pyxel.rect(10, 10, pyxel.width - 20, 4, 3)
-        pyxel.rectb(10, 10, pyxel.width - 20, 4, 7)
+        pyxel.rect(10, 10, tamanhoBarra * percenteExp, 4, 3)
+        pyxel.rectb(10, 10, tamanhoBarra, 4, 7)
+        
+        pyxel.rect(xlife, ylife, tamanhoLife * percenteLife, 1, 8)
 
 
 class Game:
