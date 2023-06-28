@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from enum import Enum
 import pyxel
 from typing import Dict
@@ -37,6 +38,18 @@ ENEMIE1 = {
 }
 
 
+@dataclass
+class HUD:
+    player: Player
+
+    def render(self):
+        pyxel.circ(10, 10, self.player.w, 7)
+        pyxel.circb(10, 10, self.player.w, 10)
+
+        pyxel.rect(10, 10, pyxel.width - 20, 4, 3)
+        pyxel.rectb(10, 10, pyxel.width - 20, 4, 7)
+
+
 class Game:
     def __init__(self):
         pyxel.init(180, 140)
@@ -46,8 +59,10 @@ class Game:
 
     def start(self):
         self.entities: Dict[type, list] = {}
+        player = Player(x=50, y=50, states=MAGE, current_state=DOWN)
         self.add(
-            Player(x=50, y=50, states=MAGE, current_state=DOWN),
+            player,
+            HUD(player),
             Enemy(speed=1, angle=45, states=ENEMIE1, current_state=DOWN)
         )
 
@@ -75,9 +90,9 @@ class Game:
         if pyxel.btn(pyxel.KEY_UP):
             player.y -= 1
         if pyxel.btnp(pyxel.KEY_SPACE):
-            player.skill_1(self.add)
+            player.skill_1(self)
         if pyxel.btnp(pyxel.KEY_A):
-            player.skill_2(self.add)
+            player.skill_3(self)
 
     def update(self):
         self.controller()
@@ -95,7 +110,9 @@ class Game:
 
         for entity_list in self.entities.values():
             for entity in entity_list:
-                entity.move()
+                # entity.move()
+                if hasattr(entity, "update"):
+                    entity.update(self)
 
                 match entity:
                     case Projectile():
@@ -104,11 +121,11 @@ class Game:
                                 self.remove(entity)
                                 entity.attack(
                                     enemy, kill_func=self.remove)
-                                self.remove(entity)
+                                # self.remove(entity)
                         for player in self.entities[Player]:
                             if entity.collide_with_target(player):
                                 entity.attack(player)
-                                self.remove(entity)
+                                # self.remove(entity)
                     case Enemy():
                         entity.angle += 5
 
