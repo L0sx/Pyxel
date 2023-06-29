@@ -1,32 +1,16 @@
 from dataclasses import dataclass
-from enum import Enum
 import pyxel
 from typing import Dict
 from engine.entities import Player, Enemy, Projectile
 from engine.components import FloatingText
+from engine.entities import LEFT, RIGHT, UP, DOWN
 
-
-class Sides(Enum):
-    LEFT = -1, 0
-    DOWN_LEFT = -1, 1
-    DOWN = 0, 1
-    DOWN_RIGHT = 1, 1
-    RIGHT = 1, 0
-    UP_RIGHT = 1, -1
-    UP = 0, -1
-    UP_LEFT = -1, -1
-
-
-LEFT = Sides.LEFT
-RIGHT = Sides.RIGHT
-UP = Sides.UP
-DOWN = Sides.DOWN
 
 FIREBALL = {
-    (2, 8, 24, 8, 5, 7),
-    (2, 8, 24, -8, 5, 7),
-    (2, 8, 16, 5, -8, 7),
-    (2, 8, 16, 5, 8, 7),
+    LEFT: ((2, 8, 24, 8, 5, 7),),
+    RIGHT: ((2, 8, 24, -8, 5, 7),),
+    UP: ((2, 8, 16, 5, -8, 7),),
+    DOWN: ((2, 8, 16, 5, 8, 7),),
 }
 FIREBALL = (
     (2, 8, 16, 5, 8, 7),
