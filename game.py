@@ -3,6 +3,7 @@ from enum import Enum
 import pyxel
 from typing import Dict
 from engine.entities import Player, Enemy, Projectile
+from engine.components import FloatingText
 
 
 class Sides(Enum):
@@ -21,6 +22,12 @@ RIGHT = Sides.RIGHT
 UP = Sides.UP
 DOWN = Sides.DOWN
 
+FIREBALL = {
+    (2, 8, 24, 8, 5, 7),
+    (2, 8, 24, -8, 5, 7),
+    (2, 8, 16, 5, -8, 7),
+    (2, 8, 16, 5, 8, 7),
+}
 FIREBALL = (
     (2, 8, 16, 5, 8, 7),
 )
@@ -42,7 +49,7 @@ ENEMIE1 = {
 class HUD:
     player: Player
 
-    def render(self):
+    def draw(self):
         xlife = self.player.x - 2
         ylife = self.player.y - 4
         life_total = xlife + 10
@@ -54,13 +61,13 @@ class HUD:
         percenteExp = (exp_atual / exp_total)
         percenteLife = (life / life_total)
         tamanhoBarra = pyxel.width - 20
-        
+
         pyxel.circ(10, 10, self.player.w, 7)
         pyxel.circb(10, 10, self.player.w, 10)
 
         pyxel.rect(10, 10, tamanhoBarra * percenteExp, 4, 3)
         pyxel.rectb(10, 10, tamanhoBarra, 4, 7)
-        
+
         pyxel.rect(xlife, ylife, tamanhoLife * percenteLife, 1, 8)
 
 
@@ -77,7 +84,8 @@ class Game:
         self.add(
             player,
             HUD(player),
-            Enemy(speed=1, angle=45, states=ENEMIE1, current_state=DOWN)
+            Enemy(speed=1, angle=45, states=ENEMIE1, current_state=DOWN),
+            FloatingText(text="55", x=50, y=50)
         )
 
     def add(self, *entities):
@@ -124,7 +132,6 @@ class Game:
 
         for entity_list in self.entities.values():
             for entity in entity_list:
-                # entity.move()
                 if hasattr(entity, "update"):
                     entity.update(self)
 
@@ -133,13 +140,10 @@ class Game:
                         for enemy in self.entities[Enemy]:
                             if entity.collide_with_target(enemy):
                                 self.remove(entity)
-                                entity.attack(
-                                    enemy, kill_func=self.remove)
-                                # self.remove(entity)
+                                entity.attack(enemy, game=self)
                         for player in self.entities[Player]:
                             if entity.collide_with_target(player):
-                                entity.attack(player)
-                                # self.remove(entity)
+                                entity.attack(player, game=self)
                     case Enemy():
                         entity.angle += 5
 
@@ -147,7 +151,7 @@ class Game:
         pyxel.cls(0)
         for entity_list in self.entities.values():
             for entity in entity_list:
-                entity.render()
+                entity.draw()
 
 
 Game()
