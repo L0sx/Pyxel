@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import pyxel
 from typing import Dict
-from entities import Player, Enemy, Projectile
+from entities import Optional, Player, Enemy, Projectile
 from engine.components import FloatingText
 from sprites import MAGE, LEFT, RIGHT, UP, DOWN, WARRIOR
 
@@ -11,16 +11,14 @@ class HUD:
     player: Player
 
     def draw(self):
-        xlife = self.player.x - 2
+        xlife = self.player.x
         ylife = self.player.y - 4
-        life_total = xlife + 10
-        tamanhoLife = self.player.w + 2
-        life = 10
+        tamanhoLife = self.player.w
         exp = 99
         exp_atual = exp if exp else 1
         exp_total = 100
         percenteExp = (exp_atual / exp_total)
-        percenteLife = (life / life_total)
+        percenteLife = (self.player.hp / self.player.max_hp)
         tamanhoBarra = pyxel.width - 20
 
         pyxel.circ(10, 10, self.player.w, 7)
@@ -49,6 +47,10 @@ class Game:
             FloatingText(text="55", x=50, y=50)
         )
 
+    def get(self, entity_type):
+        entity_list = self.entities.get(entity_type, []).copy()
+        return entity_list
+
     def add(self, *entities):
         for entity in entities:
             if not self.entities.get(type(entity)):
@@ -61,7 +63,7 @@ class Game:
                 self.entities[type(entity)].remove(entity)
 
     def controller(self):
-        player: Player = self.entities[Player][0]
+        player: Player = self.get(Player)[0]
         if pyxel.btn(pyxel.KEY_LEFT):
             player.current_state = LEFT
             player.x -= 1
@@ -93,27 +95,29 @@ class Game:
                 )
             )
 
-        for entity_list in self.entities.values():
-            for entity in entity_list:
+        print(self.get(Enemy)[0].angle)
+        for entity_type in set(self.entities.keys()):
+            for entity in self.get(entity_type):
                 if hasattr(entity, "update"):
                     entity.update(self)
 
                 match entity:
                     case Projectile():
-                        for enemy in self.entities[Enemy]:
+                        for enemy in self.get(Enemy):
                             if entity.collide_with_target(enemy):
                                 self.remove(entity)
                                 entity.attack(enemy, game=self)
-                        for player in self.entities[Player]:
+                        for player in self.get(Player):
                             if entity.collide_with_target(player):
+                                self.remove(entity)
                                 entity.attack(player, game=self)
                     case Enemy():
                         entity.angle += 5
 
     def draw(self):
         pyxel.cls(0)
-        for entity_list in self.entities.values():
-            for entity in entity_list:
+        for entity_type in set(self.entities.keys()):
+            for entity in self.get(entity_type):
                 entity.draw()
 
 
