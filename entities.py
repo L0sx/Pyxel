@@ -1,51 +1,26 @@
 from dataclasses import dataclass
 from typing import Optional
 from engine.components import StateRender, Movement, Combat
-
-
-FIREBALL = (
-    (2, 8, 16, 5, 8, 7),
-)
+from sprites import FIREBALL, Sides
 
 
 @dataclass
 class Player(StateRender, Movement):
-    hp: int = 10
-    max_hp: int = hp
+    hp: int = 3
 
     def skill_1(self, world):
         world.add(
-            Projectile(x=self.x, y=self.y, angle=-
-                       90, speed=3, origin=type(self),
-                       sprite=FIREBALL, damage=1,
+            Projectile(x=self.x, y=self.y, angle=self.current_state.value,
+                       speed=3, origin=type(self),
+                       sprite=FIREBALL[self.current_state], damage=1,
                        duration=15)
         )
 
     def skill_2(self, world):
         projs = [
-            Projectile(x=self.x, y=self.y, angle=angle, speed=3, origin=type(self),
-                       sprite=FIREBALL, damage=1, duration=15) for angle in range(0, 360, 360//8)
-        ]
-        world.add(*projs)
-
-    def skill_3(self, world):
-        projs = [
             Projectile(x=self.x-8, y=self.y-8, origin=type(self),
-                       sprite=FIREBALL, damage=1, duration=15),
-            Projectile(x=self.x, y=self.y-8, origin=type(self),
-                       sprite=FIREBALL, damage=1, duration=15),
-            Projectile(x=self.x+8, y=self.y-8, origin=type(self),
-                       sprite=FIREBALL, damage=1, duration=15),
-            Projectile(x=self.x-8, y=self.y, origin=type(self),
-                       sprite=FIREBALL, damage=1, duration=15),
-            Projectile(x=self.x+8, y=self.y, origin=type(self),
-                       sprite=FIREBALL, damage=1, duration=15),
-            Projectile(x=self.x-8, y=self.y+8, origin=type(self),
-                       sprite=FIREBALL, damage=1, duration=15),
-            Projectile(x=self.x, y=self.y+8, origin=type(self),
-                       sprite=FIREBALL, damage=1, duration=15),
-            Projectile(x=self.x+8, y=self.y+8, origin=type(self),
-                       sprite=FIREBALL, damage=1, duration=15),
+                       sprite=FIREBALL[self.current_state], damage=1, duration=15, angle=s.value, speed=2)
+            for s in Sides
         ]
         world.add(*projs)
 

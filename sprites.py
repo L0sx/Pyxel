@@ -1,21 +1,4 @@
 from enum import Enum
-from typing import Tuple
-from typing import Sequence
-
-
-SPRITE_TYPE = Tuple[int, int, int, int, int, int] | Sequence[int]
-COLKEY = 7
-
-
-class Ground:
-    GRASS1 = 1, 32, 64, 8, 8, COLKEY
-    GRASS2 = 1, 40, 64, 8, 8, COLKEY
-    GRASS3 = 1, 32, 72, 8, 8, COLKEY
-    GRASS4 = 1, 40, 72, 8, 8, COLKEY
-    WATER1 = 1, 32, 32, 8, 8, COLKEY
-    WATER2 = 1, 40, 32, 8, 8, COLKEY
-    WATER3 = 1, 32, 40, 8, 8, COLKEY
-    WATER4 = 1, 40, 40, 8, 8, COLKEY
 
 
 class Colors:
@@ -37,15 +20,24 @@ class Colors:
     BEGE = 15
 
 
+GRASS1 = [(1, 32, 64, 8, 8, Colors.WHITE),]
+GRASS2 = [(1, 40, 64, 8, 8, Colors.WHITE),]
+GRASS3 = [(1, 32, 72, 8, 8, Colors.WHITE),]
+GRASS4 = [(1, 40, 72, 8, 8, Colors.WHITE),]
+WATER1 = [(1, 32, 32, 8, 8, Colors.WHITE),]
+WATER2 = [(1, 40, 32, 8, 8, Colors.WHITE),]
+WATER3 = [(1, 32, 40, 8, 8, Colors.WHITE),]
+WATER4 = [(1, 40, 40, 8, 8, Colors.WHITE),]
+
+
 class Sides(Enum):
-    LEFT = -1, 0
-    DOWN_LEFT = -1, 1
-    DOWN = 0, 1
-    DOWN_RIGHT = 1, 1
-    RIGHT = 1, 0
-    UP_RIGHT = 1, -1
-    UP = 0, -1
-    UP_LEFT = -1, -1
+    RIGHT = 0
+    RIGHT_UP = 45
+    DOWN = 90
+    LEFT_DOWN = 135
+    LEFT = 180
+    LEFT_UP = 225
+    UP = 270
 
 
 LEFT = Sides.LEFT
@@ -54,104 +46,92 @@ UP = Sides.UP
 DOWN = Sides.DOWN
 
 
-class Inimigos:
-    TURRET = (
-        (0, 0, 48, 8, 8, COLKEY),
-        (0, 8, 48, 8, 8, COLKEY),
-        (0, 0, 56, 8, 8, COLKEY),
-        (0, 8, 56, 8, 8, COLKEY),
-    )
-    BOSS = (
-        (0, 32, 0, 16, 16, 1),
-        (0, 32, 16, 16, 16, 1),
-        (0, 48, 16, 16, 16, 1),
-        (0, 48, 16, 16, 16, 1),
-    )
+ENEMY1 = [
+    (0, 0, 48, 8, 8, Colors.WHITE),
+    (0, 8, 48, 8, 8, Colors.WHITE),
+    (0, 0, 56, 8, 8, Colors.WHITE),
+    (0, 8, 56, 8, 8, Colors.WHITE),
+]
+ENEMY2 = [
+    (0, 32, 0, 16, 16, 1),
+    (0, 32, 16, 16, 16, 1),
+    (0, 48, 16, 16, 16, 1),
+    (0, 48, 16, 16, 16, 1),
+]
 
 
-class Efeitos:
-    ATTACK = (
-        (2, 0, 0, 8, 8, 0),
-        (2, 8, 0, 8, 8, 0),
-        (2, 0, 8, 8, 8, 0),
-        (2, 8, 8, 8, 8, 0),
-    )
-    CYCLONE = (
-        (2, 0, 40, 8, 8, Colors.BLACK),
-        (2, 0, 48, 8, 8, Colors.BLACK),
-        (2, 8, 32, 8, -8, Colors.BLACK),
-        (2, 0, 48, -8, 8, Colors.BLACK),
-        (2, 0, 40, -8, 8, Colors.BLACK),
-        (2, 0, 32, -8, 8, Colors.BLACK),
-        (2, 8, 32, 8, 8, Colors.BLACK),
-        (2, 0, 32, 8, 8, Colors.BLACK),
-    )
-    ARROW = (
-        (2, 0, 24, 8, 5, Colors.WHITE),
-        (2, 0, 24, -8, 5, Colors.WHITE),
-        (2, 0, 16, 5, -8, Colors.WHITE),
-        (2, 0, 16, 5, 8, Colors.WHITE),
-    )
-    FIREBALL = (
-        (2, 8, 24, 8, 5, Colors.WHITE),
-        (2, 8, 24, -8, 5, Colors.WHITE),
-        (2, 8, 16, 5, -8, Colors.WHITE),
-        (2, 8, 16, 5, 8, Colors.WHITE),
-    )
-    EXP_ORB = (
-        (2, 16, 16, 8, 8, 15),
-        (2, 24, 16, 8, 8, 15),
-        (2, 16, 24, 8, 8, 15),
-        (2, 24, 24, 8, 8, 15)
-    )
+ATTACK = [
+    (2, 0, 0, 8, 8, 0),
+    (2, 8, 0, 8, 8, 0),
+    (2, 0, 8, 8, 8, 0),
+    (2, 8, 8, 8, 8, 0),
+]
+CYCLONE = [
+    (2, 0, 40, 8, 8, Colors.BLACK),
+    (2, 0, 48, 8, 8, Colors.BLACK),
+    (2, 8, 32, 8, -8, Colors.BLACK),
+    (2, 0, 48, -8, 8, Colors.BLACK),
+    (2, 0, 40, -8, 8, Colors.BLACK),
+    (2, 0, 32, -8, 8, Colors.BLACK),
+    (2, 8, 32, 8, 8, Colors.BLACK),
+    (2, 0, 32, 8, 8, Colors.BLACK),
+]
+ARROW = [
+    (2, 0, 24, 8, 5, Colors.WHITE),
+    (2, 0, 24, -8, 5, Colors.WHITE),
+    (2, 0, 16, 5, -8, Colors.WHITE),
+    (2, 0, 16, 5, 8, Colors.WHITE),
+]
+FIREBALL = {
+    LEFT: ((2, 8, 24, 8, 5, 7),),
+    RIGHT: ((2, 8, 24, -8, 5, 7),),
+    DOWN: ((2, 8, 16, 5, -8, 7),),
+    UP: ((2, 8, 16, 5, 8, 7),),
+}
+EXP_ORB = [
+    (2, 16, 16, 8, 8, 15),
+    (2, 24, 16, 8, 8, 15),
+    (2, 16, 24, 8, 8, 15),
+    (2, 24, 24, 8, 8, 15)
+]
 
 
-class Personagens:
-    MAGE = {
-        LEFT: (0, 16, 0, -8, 8, 7),
-        RIGHT: (0, 16, 0, 8, 8, 7),
-        UP: (0, 16, 0, 8, 8, 7),
-        DOWN: (0, 16, 0, 8, 8, 7),
-    }
+MAGE = {
+    LEFT: ((0, 16, 0, -8, 8, 7),),
+    RIGHT: ((0, 16, 0, 8, 8, 7),),
+    UP: ((0, 16, 0, 8, 8, 7),),
+    DOWN: ((0, 16, 0, 8, 8, 7),),
+}
 
-    WARRIOR = {
-        LEFT: (0, 16, 8, -8, 8, 7),
-        RIGHT: (0, 16, 8, 8, 8, 7),
-        UP: (0, 16, 8, 8, 8, 7),
-        DOWN: (0, 16, 8, 8, 8, 7),
-    }
+WARRIOR = {
+    LEFT: ((0, 16, 8, -8, 8, 7),),
+    RIGHT: ((0, 16, 8, 8, 8, 7),),
+    UP: ((0, 16, 8, 8, 8, 7),),
+    DOWN: ((0, 16, 8, 8, 8, 7),),
+}
 
-    ARCHER = {
-        LEFT: (0, 16, 16, -8, 8, 7),
-        RIGHT: (0, 16, 16, 8, 8, 7),
-        UP: (0, 16, 16, 8, 8, 7),
-        DOWN: (0, 16, 16, 8, 8, 7),
-    }
+ARCHER = {
+    LEFT: ((0, 16, 16, -8, 8, 7),),
+    RIGHT: ((0, 16, 16, 8, 8, 7),),
+    UP: ((0, 16, 16, 8, 8, 7),),
+    DOWN: ((0, 16, 16, 8, 8, 7),),
+}
 
-    PLAYER = {
-        LEFT: (0, 0, 8, 8, 8, COLKEY),
-        RIGHT: (0, 8, 8, 8, 8, COLKEY),
-        UP: (0, 8, 0, 8, 8, COLKEY),
-        DOWN: (0, 0, 0, 8, 8, COLKEY),
-    }
-    ENEMIE1 = {
-        LEFT: (0, 0, 0, 8, 8, COLKEY),
-        RIGHT: (0, 0, 0, 8, 8, COLKEY),
-        UP: (0, 0, 0, 8, 8, COLKEY),
-        DOWN: (0, 24, 0, 8, 8, 1),
-    }
-
-
-class Objetos:
-    HOUSE = 0, 32, 0, 16, 16, COLKEY
-    CARAMBA = 0, 0, 16, 8, 8, COLKEY
-    GRASS = 1, 32, 0, 8, 8, COLKEY
-    TREE = 1, 40, 0, 8, 8, COLKEY
-    PORTAL = (
-        (1, 32, 8, 8, 8, COLKEY),
-        (1, 40, 8, 8, 8, COLKEY),
-    )
-
-
-class Items:
-    blade = 2, 40, 0, 8, 8, 15
+PLAYER = {
+    LEFT: ((0, 0, 8, 8, 8, Colors.WHITE),),
+    RIGHT: ((0, 8, 8, 8, 8, Colors.WHITE),),
+    UP: ((0, 8, 0, 8, 8, Colors.WHITE),),
+    DOWN: ((0, 0, 0, 8, 8, Colors.WHITE),),
+}
+ENEMIE1 = {
+    LEFT: ((0, 0, 0, 8, 8, Colors.WHITE),),
+    RIGHT: ((0, 0, 0, 8, 8, Colors.WHITE),),
+    UP: ((0, 0, 0, 8, 8, Colors.WHITE),),
+    DOWN: ((0, 24, 0, 8, 8, 1),),
+}
+GRASS = [(1, 32, 0, 8, 8, Colors.WHITE)]
+TREE = [(1, 40, 0, 8, 8, Colors.WHITE)]
+PORTAL = [
+    (1, 32, 8, 8, 8, Colors.WHITE),
+    (1, 40, 8, 8, 8, Colors.WHITE),
+]

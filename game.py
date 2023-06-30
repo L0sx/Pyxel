@@ -1,32 +1,9 @@
 from dataclasses import dataclass
 import pyxel
 from typing import Dict
-from engine.entities import Player, Enemy, Projectile
+from entities import Player, Enemy, Projectile
 from engine.components import FloatingText
-from engine.entities import LEFT, RIGHT, UP, DOWN
-
-
-FIREBALL = {
-    LEFT: ((2, 8, 24, 8, 5, 7),),
-    RIGHT: ((2, 8, 24, -8, 5, 7),),
-    UP: ((2, 8, 16, 5, -8, 7),),
-    DOWN: ((2, 8, 16, 5, 8, 7),),
-}
-FIREBALL = (
-    (2, 8, 16, 5, 8, 7),
-)
-MAGE = {
-    LEFT: ((0, 16, 0, -8, 8, 7), ),
-    RIGHT: ((0, 16, 0, 8, 8, 7), ),
-    UP: ((0, 16, 0, 8, 8, 7), ),
-    DOWN: ((0, 16, 0, 8, 8, 7), ),
-}
-ENEMIE1 = {
-    LEFT: ((0, 0, 0, 8, 8, 7),),
-    RIGHT: ((0, 0, 0, 8, 8, 7),),
-    UP: ((0, 0, 0, 8, 8, 7),),
-    DOWN: ((0, 24, 0, 8, 8, 7),),
-}
+from sprites import MAGE, LEFT, RIGHT, UP, DOWN, WARRIOR
 
 
 @dataclass
@@ -68,7 +45,7 @@ class Game:
         self.add(
             player,
             HUD(player),
-            Enemy(speed=1, angle=45, states=ENEMIE1, current_state=DOWN),
+            Enemy(speed=1, angle=45, states=WARRIOR, current_state=DOWN),
             FloatingText(text="55", x=50, y=50)
         )
 
@@ -92,13 +69,15 @@ class Game:
             player.current_state = RIGHT
             player.x += 1
         if pyxel.btn(pyxel.KEY_DOWN):
+            player.current_state = DOWN
             player.y += 1
         if pyxel.btn(pyxel.KEY_UP):
+            player.current_state = UP
             player.y -= 1
         if pyxel.btnp(pyxel.KEY_SPACE):
             player.skill_1(self)
         if pyxel.btnp(pyxel.KEY_A):
-            player.skill_3(self)
+            player.skill_2(self)
 
     def update(self):
         self.controller()
@@ -106,7 +85,7 @@ class Game:
         if len(self.entities[Enemy]) <= 10:
             self.add(
                 Enemy(
-                    states=ENEMIE1,
+                    states=WARRIOR,
                     current_state=DOWN,
                     x=pyxel.rndi(0, pyxel.width),
                     y=pyxel.rndi(0, pyxel.width),
