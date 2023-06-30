@@ -20,6 +20,23 @@ class Colors:
     BEGE = 15
 
 
+class Sides(Enum):
+    RIGHT = 0
+    RIGHT_DOWN = 45
+    DOWN = 90
+    DOWN_LEFT = 135
+    LEFT = 180
+    LEFT_UP = 225
+    UP = 270
+    UP_RIGHT = 315
+
+
+LEFT = Sides.LEFT
+RIGHT = Sides.RIGHT
+UP = Sides.UP
+DOWN = Sides.DOWN
+
+
 GRASS1 = [(1, 32, 64, 8, 8, Colors.WHITE),]
 GRASS2 = [(1, 40, 64, 8, 8, Colors.WHITE),]
 GRASS3 = [(1, 32, 72, 8, 8, Colors.WHITE),]
@@ -28,23 +45,6 @@ WATER1 = [(1, 32, 32, 8, 8, Colors.WHITE),]
 WATER2 = [(1, 40, 32, 8, 8, Colors.WHITE),]
 WATER3 = [(1, 32, 40, 8, 8, Colors.WHITE),]
 WATER4 = [(1, 40, 40, 8, 8, Colors.WHITE),]
-
-
-class Sides(Enum):
-    RIGHT = 0
-    RIGHT_UP = 45
-    DOWN = 90
-    LEFT_DOWN = 135
-    LEFT = 180
-    LEFT_UP = 225
-    UP = 270
-
-
-LEFT = Sides.LEFT
-RIGHT = Sides.RIGHT
-UP = Sides.UP
-DOWN = Sides.DOWN
-
 
 ENEMY1 = [
     (0, 0, 48, 8, 8, Colors.WHITE),

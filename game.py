@@ -95,7 +95,6 @@ class Game:
                 )
             )
 
-        print(self.get(Enemy)[0].angle)
         for entity_type in set(self.entities.keys()):
             for entity in self.get(entity_type):
                 if hasattr(entity, "update"):
