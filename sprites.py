@@ -45,21 +45,24 @@ WATER1 = [(1, 32, 32, 8, 8, Colors.WHITE),]
 WATER2 = [(1, 40, 32, 8, 8, Colors.WHITE),]
 WATER3 = [(1, 32, 40, 8, 8, Colors.WHITE),]
 WATER4 = [(1, 40, 40, 8, 8, Colors.WHITE),]
-
+GRASS = [(1, 32, 0, 8, 8, Colors.WHITE)]
+TREE = [(1, 40, 0, 8, 8, Colors.WHITE)]
+PORTAL = [
+    (1, 32, 8, 8, 8, Colors.WHITE),
+    (1, 40, 8, 8, 8, Colors.WHITE),
+]
 ENEMY1 = [
     (0, 0, 48, 8, 8, Colors.WHITE),
     (0, 8, 48, 8, 8, Colors.WHITE),
     (0, 0, 56, 8, 8, Colors.WHITE),
     (0, 8, 56, 8, 8, Colors.WHITE),
 ]
-ENEMY2 = [
-    (0, 32, 0, 16, 16, 1),
-    (0, 32, 16, 16, 16, 1),
-    (0, 48, 16, 16, 16, 1),
-    (0, 48, 16, 16, 16, 1),
-]
-
-
+ENEMY2 = {
+    LEFT: [(0, 32, 0, 16, 16, 1)],
+    RIGHT: [(0, 32, 16, 16, 16, 1)],
+    UP: [(0, 48, 16, 16, 16, 1)],
+    DOWN: [(0, 48, 16, 16, 16, 1)],
+}
 ATTACK = [
     (2, 0, 0, 8, 8, 0),
     (2, 8, 0, 8, 8, 0),
@@ -129,9 +132,3 @@ ENEMIE1 = {
     UP: ((0, 0, 0, 8, 8, Colors.WHITE),),
     DOWN: ((0, 24, 0, 8, 8, 1),),
 }
-GRASS = [(1, 32, 0, 8, 8, Colors.WHITE)]
-TREE = [(1, 40, 0, 8, 8, Colors.WHITE)]
-PORTAL = [
-    (1, 32, 8, 8, 8, Colors.WHITE),
-    (1, 40, 8, 8, 8, Colors.WHITE),
-]

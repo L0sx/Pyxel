@@ -1,39 +1,14 @@
-from dataclasses import dataclass
 import pyxel
 from typing import Dict
-from entities import Optional, Player, Enemy, Projectile
-from engine.components import FloatingText
-from sprites import MAGE, LEFT, RIGHT, UP, DOWN, WARRIOR
-
-
-@dataclass
-class HUD:
-    player: Player
-
-    def draw(self):
-        xlife = self.player.x
-        ylife = self.player.y - 4
-        tamanhoLife = self.player.w
-        exp = 99
-        exp_atual = exp if exp else 1
-        exp_total = 100
-        percenteExp = (exp_atual / exp_total)
-        percenteLife = (self.player.hp / self.player.max_hp)
-        tamanhoBarra = pyxel.width - 20
-
-        pyxel.circ(10, 10, self.player.w, 7)
-        pyxel.circb(10, 10, self.player.w, 10)
-
-        pyxel.rect(10, 10, tamanhoBarra * percenteExp, 4, 3)
-        pyxel.rectb(10, 10, tamanhoBarra, 4, 7)
-
-        pyxel.rect(xlife, ylife, tamanhoLife * percenteLife, 1, 8)
+from entities import Enemy2, Player, Enemy, Projectile, HUD
+from sprites import ARCHER, ENEMY2, MAGE, LEFT, RIGHT, UP, DOWN, WARRIOR
 
 
 class Game:
     def __init__(self):
         pyxel.init(180, 140)
         pyxel.load('assets/pyxel.pyxres')
+        self.over = False
         self.start()
         pyxel.run(self.update, self.draw)
 
@@ -44,7 +19,6 @@ class Game:
             player,
             HUD(player),
             Enemy(speed=1, angle=45, states=WARRIOR, current_state=DOWN),
-            FloatingText(text="55", x=50, y=50)
         )
 
     def get(self, entity_type):
@@ -76,15 +50,46 @@ class Game:
         if pyxel.btn(pyxel.KEY_UP):
             player.current_state = UP
             player.y -= 1
-        if pyxel.btnp(pyxel.KEY_SPACE):
-            player.skill_1(self)
         if pyxel.btnp(pyxel.KEY_A):
+            player.skill_1(self)
+        if pyxel.btnp(pyxel.KEY_SPACE):
             player.skill_2(self)
+        if pyxel.btnp(pyxel.KEY_Q):
+            player.hp = player.max_hp
+            self.over = False
 
     def update(self):
         self.controller()
+        player = self.get(Player)[0]
 
-        if len(self.entities[Enemy]) <= 10:
+        if player.hp <= 0:
+            self.over = True
+            return
+
+        n_enemies = len(self.get(Enemy)) + len(self.get(Enemy2))
+        if n_enemies <= 10:
+            if not pyxel.frame_count % 15:
+                self.add(
+                    Enemy(
+                        states=ENEMY2,
+                        current_state=DOWN,
+                        x=pyxel.rndi(0, pyxel.width),
+                        y=pyxel.rndi(0, pyxel.width),
+                        angle=45, speed=1
+                    )
+                )
+
+            if not pyxel.frame_count % 3:
+                self.add(
+                    Enemy2(
+                        states=ARCHER,
+                        current_state=DOWN,
+                        x=pyxel.rndi(0, pyxel.width),
+                        y=pyxel.rndi(0, pyxel.width),
+                        angle=45, speed=1
+                    )
+                )
+
             self.add(
                 Enemy(
                     states=WARRIOR,
@@ -106,18 +111,23 @@ class Game:
                             if entity.collide_with_target(enemy):
                                 self.remove(entity)
                                 entity.attack(enemy, game=self)
+                                player.exp += enemy.exp
                         for player in self.get(Player):
                             if entity.collide_with_target(player):
                                 self.remove(entity)
-                                entity.attack(player, game=self)
+                                entity.attack(player)
                     case Enemy():
-                        entity.angle += 5
+                        pass
 
     def draw(self):
         pyxel.cls(0)
         for entity_type in set(self.entities.keys()):
             for entity in self.get(entity_type):
                 entity.draw()
+
+        if self.over:
+            pyxel.text(pyxel.width//2, pyxel.height//2,
+                       "GAME OVER!", pyxel.frame_count % 15)
 
 
 Game()
