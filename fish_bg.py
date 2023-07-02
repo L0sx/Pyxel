@@ -62,6 +62,12 @@ class EnemyProjectile:
 
 
 @dataclass
+class CircularMovement:
+    speed: float = 0
+    angle: float = 0
+
+
+@dataclass
 class Movement:
     speed: float = 0
     angle: float = 0
@@ -172,6 +178,7 @@ class CollissionSystem(esper.Processor):
             enemy_components = Pos, Sprite, Combat, Enemy
             for eid, (epos, esprite, ecombat, enemy) in self.world.get_components(*enemy_components):
                 if self.collide_with(ppos, psprite, epos, esprite):
+                    self.world.delete_entity(pid)
                     if self.attack(pcombat, ecombat, eid):
                         self.world.create_entity(
                             Text(str(pcombat.damage)),
@@ -244,8 +251,17 @@ class MovementSystem(esper.Processor):
         for _id, (pos, moviment) in self.world.get_components(Pos, Movement):
             self.move(pos, moviment)
 
+        for _id, (pos, moviment) in self.world.get_components(Pos, CircularMovement):
+            self.move_circular(pos, moviment)
+
         for _id, (pos, moviment, _) in self.world.get_components(Pos, Movement, Enemy):
             self.move_to_target(pos, moviment, target=player)
+
+    @staticmethod
+    def move_circular(pos, moviment):
+        angle_rad = radians(moviment.angle + pyxel.frame_count * 6)
+        pos.x += cos(angle_rad) * moviment.speed
+        pos.y += sin(angle_rad) * moviment.speed
 
     @staticmethod
     def move(pos, moviment):
@@ -328,8 +344,8 @@ class KeyboardInputProcessor(esper.Processor):
                         Projectile(),
                         Pos(x=pos.x, y=pos.y),
                         Sprite(FIREBALL[RIGHT]),
-                        Movement(speed=3, angle=side.value),
-                        Timer(25),
+                        CircularMovement(speed=3, angle=side.value),
+                        Timer(55),
                         Combat(damage=combat.damage),
                     )
             if pyxel.btn(pyxel.KEY_SPACE) and frame_cd(5):
@@ -399,6 +415,7 @@ class App:
         return
 
     def draw(self):
+        pyxel.cls(1)
         self.world.process()
 
 
