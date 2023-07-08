@@ -19,7 +19,7 @@ class App:
         log.debug("starting App")
         pyxel.init(160, 120)
         pyxel.load("assets/pyxel.pyxres")
-        
+
         self.select_player = None
         self.screens = {
             TitleScreen: TitleScreen(self),
@@ -27,7 +27,6 @@ class App:
             CreditsScreen: None,
         }
         self.current_screen = self.screens[TitleScreen]
-        
 
         pyxel.run(self.update, self.draw)
 
@@ -39,8 +38,8 @@ class App:
         self.current_screen = self.screens[screen]
 
     def update(self):
-         self.current_screen.update()
- 
+        self.current_screen.update()
+
     def draw(self):
         self.current_screen.draw()
 

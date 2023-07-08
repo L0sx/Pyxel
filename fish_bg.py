@@ -109,7 +109,7 @@ class TimerSystem(esper.Processor):
 class HUD(esper.Processor):
     def process(self):
         _, (epos, esprite, ecombat, _) = self.world.get_components(
-            Pos, Sprite, Combat, Enemy)[-1]
+            Pos, Sprite, Combat, Enemy)[0]
 
         pyxel.circb(epos.x+esprite.w//2, epos.y +
                     esprite.h//2, esprite.w, rainbow())
@@ -145,9 +145,23 @@ class EnemySpawner(esper.Processor):
         pid, (playerpos, playersprite, pcombat, player) = self.world.get_components(
             Pos, Sprite, Combat, PlayerComponent)[0]
 
+        coisa = pyxel.frame_count % 360
+        c = cos(coisa)
+        s = sin(coisa)
+
+        xhalf = pyxel.width // 2
+        yhalf = pyxel.height // 2
+
+        speed = 120
+        x = cos(coisa) * speed
+        y = sin(coisa) * speed
+        x += xhalf
+        y += yhalf
+        print(x, y)
+
         comps = self.world.get_components(Enemy)
-        if len(comps) <= 5:
-            x, y = rndxy()
+        if len(comps) <= 500:
+            # x, y = rndxy()
             self.world.create_entity(
                 Sprite(
                     states=WARRIOR,
@@ -259,7 +273,7 @@ class MovementSystem(esper.Processor):
 
     @staticmethod
     def move_circular(pos, moviment):
-        angle_rad = radians(moviment.angle + pyxel.frame_count * 6)
+        angle_rad = radians(moviment.angle + pyxel.frame_count * 10)
         pos.x += cos(angle_rad) * moviment.speed
         pos.y += sin(angle_rad) * moviment.speed
 
@@ -344,8 +358,8 @@ class KeyboardInputProcessor(esper.Processor):
                         Projectile(),
                         Pos(x=pos.x, y=pos.y),
                         Sprite(FIREBALL[RIGHT]),
-                        CircularMovement(speed=3, angle=side.value),
-                        Timer(55),
+                        CircularMovement(speed=6, angle=side.value),
+                        Timer(50),
                         Combat(damage=combat.damage),
                     )
             if pyxel.btn(pyxel.KEY_SPACE) and frame_cd(5):
