@@ -6,6 +6,12 @@ from functions import *
 import esper
 import pyxel
 
+
+class TileMapSystem(esper.Processor):
+    def process(self):
+        pyxel.bltm(0, 0, 0, 0, 0, pyxel.width, pyxel.height)
+
+
 class RenderSystem(esper.Processor):
     def process(self):
         circle_comps = Circle, Pos
@@ -21,8 +27,6 @@ class RenderSystem(esper.Processor):
         for _, (text, pos) in self.world.get_components(*text_comps):
             colkey = text.colkey if text.colkey <= 15 else rainbow()
             pyxel.text(pos.x, pos.y, text.text, colkey)
-        
-
 
 
 class TimerSystem(esper.Processor):
@@ -37,17 +41,17 @@ class TimerSystem(esper.Processor):
             if timer.time <= 0:
                 self.world.delete_entity(id)
 
+
 class CollissionSystem(esper.Processor):
     def show_upgrade(self):
         sprites = UPATTACK, UPLIFE, UPCD, UPSPEED, UPPROJECTILE
-        
 
         for i, sprite in enumerate(sprites):
             self.world.create_entity(
-                Square(16, 16),
+                Square(16, 16, 3),
                 Upgrade(),
                 Pos(
-                    x= 60 + i*20,
+                    x=60 + i*20,
                     y=pyxel.height//2,
                 ),
                 Sprite(sprite),
@@ -56,7 +60,7 @@ class CollissionSystem(esper.Processor):
                 Square(6, 6, 3),
                 Text(text=str(i)),
                 Pos(
-                    x= 60 + i*20,
+                    x=60 + i*20,
                     y=pyxel.height//2 + 20,
                 ),
                 Upgrade()
@@ -185,6 +189,7 @@ class MovementSystem(esper.Processor):
         elif distance < 50:
             self.move_away_from(pos, moviment, target)
 
+
 class SpriteSystem(esper.Processor):
     def __init__(self) -> None:
         super().__init__()
@@ -228,31 +233,31 @@ class KeyboardInputProcessor(esper.Processor):
                 if pyxel.btn(pyxel.KEY_1):
                     combat.damage += 1
                     self.world.create_entity(
-                            Text("Damage UP"),
-                            Pos(pos.x, pos.y),
-                            Movement(speed=1, angle=-90),
-                            Timer(25),
-                        )
+                        Text("Damage UP"),
+                        Pos(pos.x, pos.y),
+                        Movement(speed=1, angle=-90),
+                        Timer(25),
+                    )
                     player.selectupgrade = False
                     self.remove_update()
                 if pyxel.btn(pyxel.KEY_2):
                     player.speed += 1
                     self.world.create_entity(
-                            Text("Speed UP"),
-                            Pos(pos.x, pos.y),
-                            Movement(speed=1, angle=-90),
-                            Timer(25),
-                        )
+                        Text("Speed UP"),
+                        Pos(pos.x, pos.y),
+                        Movement(speed=1, angle=-90),
+                        Timer(25),
+                    )
                     player.selectupgrade = False
                     self.remove_update()
                 if pyxel.btn(pyxel.KEY_3):
                     player.projectiles += 1
                     self.world.create_entity(
-                            Text("Projectile UP"),
-                            Pos(pos.x, pos.y),
-                            Movement(speed=1, angle=-90),
-                            Timer(25),
-                        )
+                        Text("Projectile UP"),
+                        Pos(pos.x, pos.y),
+                        Movement(speed=1, angle=-90),
+                        Timer(25),
+                    )
                     player.selectupgrade = False
                     self.remove_update()
                 return
@@ -266,7 +271,7 @@ class KeyboardInputProcessor(esper.Processor):
                 pos.y += player.speed
             if pyxel.btn(pyxel.KEY_Q) and self.delay_q <= pyxel.frame_count:
                 self.delay_q = int(pyxel.frame_count) + 30
-                #print(f"{self.delay_q=} {pyxel.frame_count=}")
+                # print(f"{self.delay_q=} {pyxel.frame_count=}")
                 for side in Sides:
                     self.world.create_entity(
                         Projectile(),
@@ -307,6 +312,7 @@ class KeyboardInputProcessor(esper.Processor):
                         Timer(25),
                         Combat(damage=combat.damage),
                     )
+
 
 class HUD(esper.Processor):
     def process(self):
