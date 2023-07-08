@@ -132,3 +132,28 @@ ENEMIE1 = {
     UP: ((0, 0, 0, 8, 8, Colors.WHITE),),
     DOWN: ((0, 24, 0, 8, 8, 1),),
 }
+
+UPATTACK = [
+    (2, 32, 16, 16, 16, Colors.BLACK),
+    (2, 48, 16, 16, 16, Colors.BLACK),
+]
+
+UPLIFE = [
+    (2, 32, 32, 16, 16, Colors.BLACK),
+    (2, 48, 32, 16, 16, Colors.BLACK),
+]
+
+UPPROJECTILE = [
+    (2, 32, 48, 16, 16, Colors.BLACK),
+    (2, 48, 48, 16, 16, Colors.BLACK),
+]
+
+UPSPEED = [
+    (2, 32, 64, 16, 16, Colors.BLACK),
+    (2, 48, 64, 16, 16, Colors.BLACK),
+]
+
+UPCD = [
+    (2, 32, 80, 16, 16, Colors.BLACK),
+    (2, 48, 80, 16, 16, Colors.BLACK),
+]
