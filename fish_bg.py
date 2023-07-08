@@ -3,7 +3,7 @@ from math import atan2, cos, degrees, pi, radians, sin, sqrt
 from typing import Any, Dict, Optional, Sequence
 from sprites import ARCHER, DOWN, FIREBALL, MAGE, RIGHT, WARRIOR, Sides
 
-from engine import esper
+import esper
 import pyxel
 
 
