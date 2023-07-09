@@ -55,10 +55,11 @@ class CollissionSystem(esper.Processor):
                     y=pyxel.height//2,
                 ),
                 Sprite(sprite),
+                "QEWRTWERT"
             )
             self.world.create_entity(
                 Square(6, 6, 3),
-                Text(text=str(i)),
+                Text(text=str(i+1)),
                 Pos(
                     x=60 + i*20,
                     y=pyxel.height//2 + 20,
@@ -224,94 +225,112 @@ class KeyboardInputProcessor(esper.Processor):
         self.delay_w = 0
 
     def remove_update(self):
-        for ent, (upgrade) in self.world.get_components(Upgrade):
+        for ent, (upgrade, s) in self.world.get_components(Upgrade, str):
+            print(s)
             self.world.delete_entity(ent)
+
+    def choose_upgrade(self, player, combat, pos):
+        if pyxel.btn(pyxel.KEY_1):
+            combat.damage += 1
+            self.world.create_entity(
+                Text("Damage UP"),
+                Pos(pos.x, pos.y),
+                Movement(speed=1, angle=-90),
+                Timer(25),
+            )
+            player.selectupgrade = False
+            self.remove_update()
+        if pyxel.btn(pyxel.KEY_2):
+            player.speed += 1
+            self.world.create_entity(
+                Text("Speed UP"),
+                Pos(pos.x, pos.y),
+                Movement(speed=1, angle=-90),
+                Timer(25),
+            )
+            player.selectupgrade = False
+            self.remove_update()
+        if pyxel.btn(pyxel.KEY_3):
+            player.projectiles += 1
+            self.world.create_entity(
+                Text("Projectile UP"),
+                Pos(pos.x, pos.y),
+                Movement(speed=1, angle=-90),
+                Timer(25),
+            )
+            player.selectupgrade = False
+            self.remove_update()
+        if pyxel.btn(pyxel.KEY_4):
+            if player.atk_speed > 0:
+                player.atk_speed -= 10
+            self.world.create_entity(
+                Text("ATK speed UP"),
+                Pos(pos.x, pos.y),
+                Movement(speed=1, angle=-90),
+                Timer(25),
+            )
+            player.selectupgrade = False
+            self.remove_update()
+
+    def game_input(self, player, pos, combat):
+        if pyxel.btn(pyxel.KEY_LEFT):
+            pos.x -= player.speed
+        if pyxel.btn(pyxel.KEY_RIGHT):
+            pos.x += player.speed
+        if pyxel.btn(pyxel.KEY_UP):
+            pos.y -= player.speed
+        if pyxel.btn(pyxel.KEY_DOWN):
+            pos.y += player.speed
+        if pyxel.btn(pyxel.KEY_Q) and self.delay_q <= pyxel.frame_count:
+            self.delay_q = int(pyxel.frame_count) + player.atk_speed
+            # print(f"{self.delay_q=} {pyxel.frame_count=}")
+            for side in Sides:
+                self.world.create_entity(
+                    Projectile(),
+                    Pos(x=pos.x, y=pos.y),
+                    Sprite(FIREBALL[RIGHT]),
+                    CircularMovement(speed=6, angle=side.value),
+                    Timer(50),
+                    Combat(damage=combat.damage),
+                )
+        if pyxel.btn(pyxel.KEY_W) and self.delay_w <= pyxel.frame_count:
+            self.delay_w = int(pyxel.frame_count) + player.atk_speed
+            _, (epos, esprite, ecombat, _) = self.world.get_components(
+                Pos, Sprite, Combat, Enemy)[0]
+
+            dx = pos.x - epos.x
+            dy = pos.y - epos.y
+            angle = - degrees(atan2(dx, dy)) - 90
+
+            start = -25
+            stop = 25
+            step = (abs(start) + abs(stop)) // player.projectiles
+            if player.projectiles > 1:
+                for ang_dif in range(start, stop + step, step):
+                    self.world.create_entity(
+                        Projectile(),
+                        Pos(x=pos.x, y=pos.y),
+                        Sprite(FIREBALL[RIGHT]),
+                        Movement(speed=3, angle=angle+ang_dif),
+                        Timer(25),
+                        Combat(damage=combat.damage),
+                    )
+            else:
+                self.world.create_entity(
+                    Projectile(),
+                    Pos(x=pos.x, y=pos.y),
+                    Sprite(FIREBALL[RIGHT]),
+                    Movement(speed=3, angle=angle),
+                    Timer(25),
+                    Combat(damage=combat.damage),
+                )
 
     def process(self):
         for ent, (pos, combat, player) in self.world.get_components(Pos, Combat, PlayerComponent):
             if player.selectupgrade:
-                if pyxel.btn(pyxel.KEY_1):
-                    combat.damage += 1
-                    self.world.create_entity(
-                        Text("Damage UP"),
-                        Pos(pos.x, pos.y),
-                        Movement(speed=1, angle=-90),
-                        Timer(25),
-                    )
-                    player.selectupgrade = False
-                    self.remove_update()
-                if pyxel.btn(pyxel.KEY_2):
-                    player.speed += 1
-                    self.world.create_entity(
-                        Text("Speed UP"),
-                        Pos(pos.x, pos.y),
-                        Movement(speed=1, angle=-90),
-                        Timer(25),
-                    )
-                    player.selectupgrade = False
-                    self.remove_update()
-                if pyxel.btn(pyxel.KEY_3):
-                    player.projectiles += 1
-                    self.world.create_entity(
-                        Text("Projectile UP"),
-                        Pos(pos.x, pos.y),
-                        Movement(speed=1, angle=-90),
-                        Timer(25),
-                    )
-                    player.selectupgrade = False
-                    self.remove_update()
+                self.choose_upgrade(player, combat, pos)
                 return
-            if pyxel.btn(pyxel.KEY_LEFT):
-                pos.x -= player.speed
-            if pyxel.btn(pyxel.KEY_RIGHT):
-                pos.x += player.speed
-            if pyxel.btn(pyxel.KEY_UP):
-                pos.y -= player.speed
-            if pyxel.btn(pyxel.KEY_DOWN):
-                pos.y += player.speed
-            if pyxel.btn(pyxel.KEY_Q) and self.delay_q <= pyxel.frame_count:
-                self.delay_q = int(pyxel.frame_count) + 30
-                # print(f"{self.delay_q=} {pyxel.frame_count=}")
-                for side in Sides:
-                    self.world.create_entity(
-                        Projectile(),
-                        Pos(x=pos.x, y=pos.y),
-                        Sprite(FIREBALL[RIGHT]),
-                        CircularMovement(speed=6, angle=side.value),
-                        Timer(50),
-                        Combat(damage=combat.damage),
-                    )
-            if pyxel.btn(pyxel.KEY_W) and self.delay_w <= pyxel.frame_count:
-                self.delay_w = int(pyxel.frame_count) + 30
-                _, (epos, esprite, ecombat, _) = self.world.get_components(
-                    Pos, Sprite, Combat, Enemy)[0]
-
-                dx = pos.x - epos.x
-                dy = pos.y - epos.y
-                angle = - degrees(atan2(dx, dy)) - 90
-
-                start = -25
-                stop = 25
-                step = (abs(start) + abs(stop)) // player.projectiles
-                if player.projectiles > 1:
-                    for ang_dif in range(start, stop + step, step):
-                        self.world.create_entity(
-                            Projectile(),
-                            Pos(x=pos.x, y=pos.y),
-                            Sprite(FIREBALL[RIGHT]),
-                            Movement(speed=3, angle=angle+ang_dif),
-                            Timer(25),
-                            Combat(damage=combat.damage),
-                        )
-                else:
-                    self.world.create_entity(
-                        Projectile(),
-                        Pos(x=pos.x, y=pos.y),
-                        Sprite(FIREBALL[RIGHT]),
-                        Movement(speed=3, angle=angle),
-                        Timer(25),
-                        Combat(damage=combat.damage),
-                    )
+            self.game_input(player, pos, combat)
 
 
 class HUD(esper.Processor):

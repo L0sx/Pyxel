@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Dict, Optional, Sequence
 
+
 @dataclass
 class Sprite:
     sprite: Sequence[tuple] = ((0, 0, 0, 8, 8, 0), )
@@ -15,6 +16,7 @@ class Circle:
     r: int = 10
     colkey: int = 16
     r_inc: int = 0
+
 
 @dataclass
 class Square:
@@ -71,6 +73,7 @@ class Text:
     text: str = "PLACEHOLDER"
     colkey: int = 16
 
+
 class PlayerComponent:
     exp: int = 0
     exp_total: int = 10
@@ -78,5 +81,8 @@ class PlayerComponent:
     projectiles: int = 1
     selectupgrade: bool = False
     speed: int = 1
+    atk_speed: int = 30
+
+
 class Upgrade:
     pass
