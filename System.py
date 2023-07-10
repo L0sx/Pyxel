@@ -113,7 +113,7 @@ class TimerSystem(esper.Processor):
     def process(self):
         pid, (_, player) = self.world.get_components(
             Pos, PlayerComponent)[0]
-        if player.selectupgrade:
+        if player.pause:
             return
         for id, timer in self.world.get_components(Timer):
             timer = timer[0]
@@ -125,7 +125,15 @@ class TimerSystem(esper.Processor):
 class CollissionSystem(esper.Processor):
     def show_upgrade(self):
         sprites = UPATTACK, UPLIFE, UPPROJECTILE, UPCD, UPSPEED
-
+        self.world.create_entity(
+            Square(110, 50, 4),
+            Upgrade(),
+            Text("choose you upgrade"),
+            Pos(
+                x=52,
+                y=70,
+            ),
+        )
         for i, sprite in enumerate(sprites):
             self.world.create_entity(
                 Square(16, 16, 3),
@@ -138,13 +146,12 @@ class CollissionSystem(esper.Processor):
             )
             self.world.create_entity(
                 Square(6, 6, 3),
+                Upgrade(),
                 Text(text=str(i+1)),
                 Pos(
-                    x=60 + i*20,
+                    x=65 + i*20,
                     y=pyxel.height//2 + 20,
-                ),
-                Upgrade()
-
+                )
             )
 
     def player_enter_portal(self, player_pos: Pos, player_sprite: Sprite):
@@ -166,7 +173,7 @@ class CollissionSystem(esper.Processor):
     def process(self):
         pid, (playerpos, playersprite, playercombat, player) = self.world.get_components(
             Pos, Sprite, Combat, PlayerComponent)[0]
-        if player.selectupgrade:
+        if player.pause:
             return
         self.player_enter_portal(playerpos, playersprite)
 
@@ -194,7 +201,7 @@ class CollissionSystem(esper.Processor):
                         player.exp = player.exp_total - player.exp
                         player.exp_total = int(player.exp_total*pi)
                         player.level += 1
-                        player.selectupgrade = True
+                        player.pause = True
                         self.show_upgrade()
                         self.world.create_entity(
                             Circle(r_inc=1),
@@ -212,6 +219,9 @@ class CollissionSystem(esper.Processor):
                             Timer(25),
                         )
 
+                    if player.is_alive == False:
+                        print("limamei")
+
         enemy_components = Pos, Sprite, Combat, Enemy
         for eid, (epos, esprite, ecombat, enemy) in self.world.get_components(*enemy_components):
             if self.collide_with(epos, esprite, playerpos, playersprite):
@@ -227,8 +237,8 @@ class CollissionSystem(esper.Processor):
         combat2.hp -= combat1.damage
         if combat2.hp <= 0 and combat2_id:
             self.world.delete_entity(combat2_id)
-            pyxel.play(0, 0)
-            return True
+        pyxel.play(0, 0)
+        return True
 
     @staticmethod
     def collide_with(render1, sprite1, render2, sprite2):
@@ -243,7 +253,7 @@ class MovementSystem(esper.Processor):
     def process(self):
         _, (player, playercomponent) = self.world.get_components(
             Pos, PlayerComponent)[0]
-        if playercomponent.selectupgrade:
+        if playercomponent.pause:
             return
         for _id, (pos, moviment) in self.world.get_components(Pos, Movement):
             self.move(pos, moviment)
@@ -322,7 +332,7 @@ class KeyboardInputProcessor(esper.Processor):
         self.delay_w = 0
 
     def remove_update(self):
-        for ent, (upgrades) in self.world.get_components(Upgrade):
+        for ent, (upgrade) in self.world.get_components(Upgrade):
             self.world.delete_entity(ent)
 
     def choose_upgrade(self, player, combat, pos):
@@ -334,7 +344,7 @@ class KeyboardInputProcessor(esper.Processor):
                 Movement(speed=1, angle=-90),
                 Timer(25),
             )
-            player.selectupgrade = False
+            player.pause = False
             self.remove_update()
         if pyxel.btn(pyxel.KEY_2):
             combat.hp += 2
@@ -345,6 +355,8 @@ class KeyboardInputProcessor(esper.Processor):
                 Movement(speed=1, angle=-90),
                 Timer(25),
             )
+            player.pause = False
+            self.remove_update()
         if pyxel.btn(pyxel.KEY_3):
             player.projectiles += 1
             self.world.create_entity(
@@ -353,7 +365,7 @@ class KeyboardInputProcessor(esper.Processor):
                 Movement(speed=1, angle=-90),
                 Timer(25),
             )
-            player.selectupgrade = False
+            player.pause = False
             self.remove_update()
         if pyxel.btn(pyxel.KEY_4):
             if player.atk_speed > 0:
@@ -364,17 +376,7 @@ class KeyboardInputProcessor(esper.Processor):
                 Movement(speed=1, angle=-90),
                 Timer(25),
             )
-            player.selectupgrade = False
-            self.remove_update()
-        if pyxel.btn(pyxel.KEY_5):
-            player.speed += 1
-            self.world.create_entity(
-                Text("Speed UP"),
-                Pos(pos.x, pos.y),
-                Movement(speed=1, angle=-90),
-                Timer(25),
-            )
-            player.selectupgrade = False
+            player.pause = False
             self.remove_update()
 
     def game_input(self, player, pos, combat):
@@ -434,7 +436,7 @@ class KeyboardInputProcessor(esper.Processor):
 
     def process(self):
         for ent, (pos, combat, player) in self.world.get_components(Pos, Combat, PlayerComponent):
-            if player.selectupgrade:
+            if player.pause:
                 self.choose_upgrade(player, combat, pos)
                 return
             self.game_input(player, pos, combat)
