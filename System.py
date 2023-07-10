@@ -225,8 +225,7 @@ class KeyboardInputProcessor(esper.Processor):
         self.delay_w = 0
 
     def remove_update(self):
-        for ent, (upgrade, s) in self.world.get_components(Upgrade, str):
-            print(s)
+        for ent, (upgrades) in self.world.get_components(Upgrade):
             self.world.delete_entity(ent)
 
     def choose_upgrade(self, player, combat, pos):
