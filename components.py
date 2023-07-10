@@ -79,9 +79,10 @@ class PlayerComponent:
     exp_total: int = 10
     level: int = 1
     projectiles: int = 1
-    selectupgrade: bool = False
+    pause: bool = False
     speed: int = 1
     atk_speed: int = 30
+    is_alive: bool = True
 
 
 class Upgrade:
