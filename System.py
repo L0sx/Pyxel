@@ -8,6 +8,37 @@ import pyxel
 
 
 class LevelSystem(esper.Processor):
+    def __init__(self) -> None:
+        super().__init__()
+        self.tilemap: bool = False
+
+    def create_tile_entities(self):
+        if self.tilemap:
+            return
+
+        grass = [
+            (0, 0),
+            (4, 8),
+            (4, 9),
+            (5, 8),
+            (5, 9)
+        ]
+        wallspr = [
+            (0, 2),
+            (0, 3),
+        ]
+        for y in range(0, pyxel.height, 8):
+            for x in range(0, pyxel.width, 8):
+                tile = get_tile(x//8, y//8)
+                print(tile, x, y)
+                if tile not in grass:
+                    self.world.create_entity(
+                        Wall(),
+                        Pos(x, y),
+                    )
+
+        self.tilemap = True
+
     def spawn_level(self, level):
         for _ in range(level*10):
             x, y = rndxy()
@@ -72,6 +103,7 @@ class LevelSystem(esper.Processor):
 
     def process(self):
         pyxel.bltm(0, 0, 0, 0, 0, pyxel.width, pyxel.height)
+        self.create_tile_entities()
 
         for _, (level) in self.world.get_components(Level):
             level = level[0]
@@ -250,19 +282,31 @@ class CollissionSystem(esper.Processor):
 
 
 class MovementSystem(esper.Processor):
+    def collide_with_walls(self, pos, sprite, walls):
+        for id, (wall, wall_pos) in walls:
+            s = Sprite()
+            if CollissionSystem.collide_with(pos, sprite, wall_pos, s):
+                return True
+
     def process(self):
         _, (player, playercomponent) = self.world.get_components(
             Pos, PlayerComponent)[0]
+
         if playercomponent.pause:
             return
-        for _id, (pos, moviment) in self.world.get_components(Pos, Movement):
-            self.move(pos, moviment)
 
-        for _id, (pos, moviment) in self.world.get_components(Pos, CircularMovement):
-            self.move_circular(pos, moviment)
+        walls = self.world.get_components(Wall, Pos)
+        for _id, (pos, moviment, sprite) in self.world.get_components(Pos, Movement, Sprite):
+            if not self.collide_with_walls(pos, sprite, walls):
+                self.move(pos, moviment)
 
-        for _id, (pos, moviment, _) in self.world.get_components(Pos, Movement, Enemy):
-            self.move_to_target(pos, moviment, target=player)
+        for _id, (pos, moviment, sprite) in self.world.get_components(Pos, CircularMovement, Sprite):
+            if not self.collide_with_walls(pos, sprite, walls):
+                self.move_circular(pos, moviment)
+
+        for _id, (pos, moviment, _, sprite) in self.world.get_components(Pos, Movement, Enemy, Sprite):
+            if not self.collide_with_walls(pos, sprite, walls):
+                self.move_to_target(pos, moviment, target=player)
 
     @staticmethod
     def move_circular(pos, moviment):

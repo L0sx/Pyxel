@@ -102,3 +102,7 @@ class Level:
 
 class Portal:
     pass
+
+
+class Wall:
+    pass
