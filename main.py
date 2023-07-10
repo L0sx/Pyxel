@@ -15,7 +15,7 @@ class App:
         # pyxel.playm(0, loop=True)
 
         self.world = esper.World()
-        self.world.add_processor(TileMapSystem())
+        self.world.add_processor(LevelSystem())
         self.world.add_processor(MovementSystem())
         self.world.add_processor(EnemySpawner())
         self.world.add_processor(HUD())
@@ -36,6 +36,10 @@ class App:
             ),
             PlayerComponent(),
             Combat(hp=5, max_hp=5, damage=1)
+        )
+
+        self.world.create_entity(
+            Level(1)
         )
 
         pyxel.run(self.update, self.draw)

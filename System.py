@@ -1,10 +1,90 @@
 from math import atan2, cos, degrees, pi, radians, sin, sqrt
-from sprites import ARCHER, DOWN, FIREBALL, MAGE, RIGHT, WARRIOR, Sides, UPATTACK, UPLIFE, UPCD, UPSPEED, UPPROJECTILE
+from sprites import ARCHER, DOWN, FIREBALL, MAGE, PORTAL, RIGHT, WARRIOR, Sides, UPATTACK, UPLIFE, UPCD, UPSPEED, UPPROJECTILE, ENEMY2
 from components import *
 from functions import *
 
 import esper
 import pyxel
+
+
+class LevelSystem(esper.Processor):
+    def spawn_level(self, level):
+        for _ in range(level*10):
+            x, y = rndxy()
+            self.world.create_entity(
+                Sprite(
+                    states=WARRIOR,
+                    current_state=DOWN
+                ),
+                Pos(
+                    x=x,
+                    y=y,
+                ),
+                Movement(speed=1),
+                Enemy(),
+                Combat(hp=1, damage=1),
+            )
+
+    def spawn_boss(self, level):
+        x, y = rndxy()
+        self.world.create_entity(
+            Sprite(
+                states=ENEMY2,
+                current_state=DOWN
+            ),
+            Pos(
+                x=x,
+                y=y,
+            ),
+            Movement(speed=1),
+            Enemy(),
+            Combat(hp=2*level, max_hp=2*level, damage=level),
+        )
+
+        for _ in range(3):
+            x, y = rndxy()
+            self.world.create_entity(
+                Sprite(
+                    states=WARRIOR,
+                    current_state=DOWN
+                ),
+                Pos(
+                    x=x,
+                    y=y,
+                ),
+                Movement(speed=1),
+                Enemy(),
+                Combat(hp=1, damage=1),
+            )
+
+    def spawn_portal(self, level):
+        x, y = rndxy()
+        self.world.create_entity(
+            Portal(),
+            Sprite(
+                sprite=PORTAL
+            ),
+            Pos(
+                x=x,
+                y=y,
+            ),
+        )
+
+    def process(self):
+        pyxel.bltm(0, 0, 0, 0, 0, pyxel.width, pyxel.height)
+
+        for _, (level) in self.world.get_components(Level):
+            level = level[0]
+            enemy_count = len(self.world.get_components(Enemy))
+            if not level.spawned:
+                self.spawn_level(level.level)
+                level.spawned = True
+            elif level.spawned and not level.boss and enemy_count == 0:
+                self.spawn_boss(level.level)
+                level.boss = True
+            elif level.spawned and level.boss and not level.portal and enemy_count == 0:
+                self.spawn_portal(level.level)
+                level.portal = True
 
 
 class TileMapSystem(esper.Processor):
@@ -44,7 +124,7 @@ class TimerSystem(esper.Processor):
 
 class CollissionSystem(esper.Processor):
     def show_upgrade(self):
-        sprites = UPATTACK, UPLIFE, UPCD, UPSPEED, UPPROJECTILE
+        sprites = UPATTACK, UPLIFE, UPPROJECTILE, UPCD, UPSPEED
 
         for i, sprite in enumerate(sprites):
             self.world.create_entity(
@@ -55,7 +135,6 @@ class CollissionSystem(esper.Processor):
                     y=pyxel.height//2,
                 ),
                 Sprite(sprite),
-                "QEWRTWERT"
             )
             self.world.create_entity(
                 Square(6, 6, 3),
@@ -68,11 +147,29 @@ class CollissionSystem(esper.Processor):
 
             )
 
+    def player_enter_portal(self, player_pos: Pos, player_sprite: Sprite):
+        portal = self.world.get_components(Portal, Pos, Sprite)
+        if portal:
+            portal_id, (_, pos, sprite) = portal[0]
+            if self.collide_with(pos, sprite, player_pos, player_sprite):
+                level_id, comps = self.world.get_components(Level)[0]
+                level = comps[0]
+                level.level += 1
+                level.spawned = False
+                level.boss = False
+                level.portal = False
+                print(level)
+                self.world.delete_entity(portal_id)
+                for pid, comps in self.world.get_components(Projectile):
+                    self.world.delete_entity(pid)
+
     def process(self):
         pid, (playerpos, playersprite, playercombat, player) = self.world.get_components(
             Pos, Sprite, Combat, PlayerComponent)[0]
         if player.selectupgrade:
             return
+        self.player_enter_portal(playerpos, playersprite)
+
         for eid, (pos, sprite) in self.world.get_components(Pos, Sprite):
             if pid == eid:
                 continue
@@ -240,15 +337,14 @@ class KeyboardInputProcessor(esper.Processor):
             player.selectupgrade = False
             self.remove_update()
         if pyxel.btn(pyxel.KEY_2):
-            player.speed += 1
+            combat.hp += 2
+            combat.max_hp += 2
             self.world.create_entity(
-                Text("Speed UP"),
+                Text("HP UP"),
                 Pos(pos.x, pos.y),
                 Movement(speed=1, angle=-90),
                 Timer(25),
             )
-            player.selectupgrade = False
-            self.remove_update()
         if pyxel.btn(pyxel.KEY_3):
             player.projectiles += 1
             self.world.create_entity(
@@ -270,6 +366,16 @@ class KeyboardInputProcessor(esper.Processor):
             )
             player.selectupgrade = False
             self.remove_update()
+        if pyxel.btn(pyxel.KEY_5):
+            player.speed += 1
+            self.world.create_entity(
+                Text("Speed UP"),
+                Pos(pos.x, pos.y),
+                Movement(speed=1, angle=-90),
+                Timer(25),
+            )
+            player.selectupgrade = False
+            self.remove_update()
 
     def game_input(self, player, pos, combat):
         if pyxel.btn(pyxel.KEY_LEFT):
@@ -282,7 +388,6 @@ class KeyboardInputProcessor(esper.Processor):
             pos.y += player.speed
         if pyxel.btn(pyxel.KEY_Q) and self.delay_q <= pyxel.frame_count:
             self.delay_q = int(pyxel.frame_count) + player.atk_speed
-            # print(f"{self.delay_q=} {pyxel.frame_count=}")
             for side in Sides:
                 self.world.create_entity(
                     Projectile(),
@@ -296,6 +401,9 @@ class KeyboardInputProcessor(esper.Processor):
             self.delay_w = int(pyxel.frame_count) + player.atk_speed
             _, (epos, esprite, ecombat, _) = self.world.get_components(
                 Pos, Sprite, Combat, Enemy)[0]
+
+            if not epos:
+                return
 
             dx = pos.x - epos.x
             dy = pos.y - epos.y
@@ -334,16 +442,15 @@ class KeyboardInputProcessor(esper.Processor):
 
 class HUD(esper.Processor):
     def process(self):
-        _, (epos, esprite, ecombat, _) = self.world.get_components(
-            Pos, Sprite, Combat, Enemy)[0]
-
-        pyxel.circb(epos.x+esprite.w//2, epos.y +
-                    esprite.h//2, esprite.w, rainbow())
-
+        enemycomps = self.world.get_components(Pos, Sprite, Combat, Enemy)
         _, (pos, sprite, combat, player) = self.world.get_components(
             Pos, Sprite, Combat, PlayerComponent)[0]
 
-        pyxel.line(epos.x, epos.y, pos.x, pos.y, rainbow())
+        if enemycomps:
+            _, (epos, esprite, ecombat, _) = enemycomps[0]
+            pyxel.circb(epos.x+esprite.w//2, epos.y +
+                        esprite.h//2, esprite.w, rainbow())
+            pyxel.line(epos.x, epos.y, pos.x, pos.y, rainbow())
 
         exp = player.exp
         exp_atual = exp if exp else 1
@@ -385,6 +492,7 @@ class EnemySpawner(esper.Processor):
         y += yhalf
 
         comps = self.world.get_components(Enemy)
+        return
         if len(comps) <= 10:
             # x, y = rndxy()
             self.world.create_entity(

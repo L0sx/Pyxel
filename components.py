@@ -86,3 +86,18 @@ class PlayerComponent:
 
 class Upgrade:
     pass
+
+
+@dataclass
+class Level:
+    level: int = 1
+    spawned: bool = False
+    boss: bool = False
+    portal: bool = False
+
+    def __get__(self):
+        return self.level
+
+
+class Portal:
+    pass
